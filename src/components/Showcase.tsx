@@ -218,14 +218,14 @@ export default function Showcase() {
                     onClick={() => setActiveSimulatorTab("timeline")}
                     className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${activeSimulatorTab === "timeline" ? 'bg-brand-rose text-white' : 'text-stone-300 hover:text-white'}`}
                   >
-                    Pacing &amp; Retention Blueprint
+                    Storytelling Structure
                   </button>
                 </div>
 
                 {activeSimulatorTab === "editorial" ? (
                   <div className="space-y-4">
                     <p className="font-sans text-xs text-white/80 leading-relaxed">
-                      This video is optimized for maximum educational payout. By overlaying close-up macro brush angles with an active voiceover rather than standard elevator music, viewers consume the tutorial as &quot;skin-prep curriculum.&quot; 
+                      This video is focused on sharing honest, educational value. By using close-ups and an active, conversational voiceover rather than trending background audio, I help my audience understand how the product wears and feels on real skin.
                     </p>
 
                     <div className="grid grid-cols-3 gap-3">
@@ -245,35 +245,35 @@ export default function Showcase() {
 
                     <div className="bg-brand-sand/10 border-l-2 border-brand-blush p-3 rounded-r-xl">
                       <p className="font-sans text-[11px] text-stone-200">
-                        <strong>Creator Insight:</strong> &quot;To secure high affiliate conversions, I mention in the audio that I have color swatches for each pigment tone available inside my Direct Message link. Followers comment to get immediate affiliate recommendations.&quot;
+                        <strong>Creator Insight:</strong> &quot;I love answering comments directly! I always make sure to let my audience know they can ask questions in the comments, which is where we have our most authentic conversations.&quot;
                       </p>
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-3.5">
-                    {/* Retention map timelines */}
+                    {/* Storytelling timelines */}
                     <div className="space-y-2.5">
                       <div className="flex items-start gap-2">
                         <span className="font-mono text-[10px] text-brand-blush bg-brand-rose/20 px-1.5 py-0.5 rounded mt-0.5">0-5s</span>
                         <div>
-                          <p className="text-[11px] font-bold">The Hook Overlay</p>
-                          <p className="text-[10px] text-stone-300">Fast zoom transition showing completed radiant glow. Immediately asks a problem statement to retain interest.</p>
+                          <p className="text-[11px] font-bold">The Warm Hook</p>
+                          <p className="text-[10px] text-stone-300">Fast transition showing a completed radiant look. Immediately asks a relatable question to set up the tutorial.</p>
                         </div>
                       </div>
 
                       <div className="flex items-start gap-2 border-t border-white/5 pt-2">
                         <span className="font-mono text-[10px] text-brand-blush bg-brand-rose/20 px-1.5 py-0.5 rounded mt-0.5">5-25s</span>
                         <div>
-                          <p className="text-[11px] font-bold">Zoom-In Swatch Wear-Test</p>
-                          <p className="text-[10px] text-stone-300">Macro focus showing raw, unedited blush/toner blending directly over skin pores. Solidifies real-world proof.</p>
+                          <p className="text-[11px] font-bold">Honest Application &amp; Blending</p>
+                          <p className="text-[10px] text-stone-300">Macro focus showing real, unedited blending of the product over skin texture to demonstrate true wear and performance.</p>
                         </div>
                       </div>
 
                       <div className="flex items-start gap-2 border-t border-white/5 pt-2">
                         <span className="font-mono text-[10px] text-brand-blush bg-brand-rose/20 px-1.5 py-0.5 rounded mt-0.5">25-45s</span>
                         <div>
-                          <p className="text-[11px] font-bold">Comment-to-DM Trigger Callout</p>
-                          <p className="text-[10px] text-stone-300">Points to the affiliate button in the caption. Triggers our automated Instagram-to-WhatsApp pipeline.</p>
+                          <p className="text-[11px] font-bold">Personal Experience &amp; Tips</p>
+                          <p className="text-[10px] text-stone-300">Explaining who this product is best suited for and encouraging viewers to ask any questions in the comments.</p>
                         </div>
                       </div>
                     </div>

@@ -43,41 +43,41 @@ export default function TrustCollab({ onSelectService }: TrustCollabProps) {
       id: "ugc",
       icon: <Video size={18} className="text-brand-rose" />,
       title: "UGC Content Creation",
-      desc: "Crisp, raw, or fully edited vertical video footage of wear tests or applications. Engineered specifically to convert when deployed as social media advertisement creatives.",
-      deliverables: "1x raw video + edited variants, standard 30-day social ad rights.",
-      badge: "High Conversion rate"
+      desc: "Create authentic, creator-style videos that feel natural, engaging, and relatable.",
+      deliverables: "Product demonstrations • Beauty tutorials • Product application videos • Lifestyle beauty content • Short-form vertical videos. Perfect For: Social media advertising, product launches, and brand awareness campaigns.",
+      badge: "UGC Content"
     },
     {
       id: "reels",
       icon: <Sparkles size={18} className="text-brand-rose" />,
-      title: "Sponsored Instagram Reel",
-      desc: "A fully custom or seamless product integration inside a highly stylized transition tutorial, a detailed GRWM chat, or a dedicated swatching video.",
-      deliverables: "1x Published Reel, 3x custom story prompts, permanent post archiving.",
-      badge: "High Engagement rate"
+      title: "Sponsored Instagram Reels",
+      desc: "Feature your product naturally within beauty tutorials, GRWM videos, product reviews, or transformation content.",
+      deliverables: "1 Instagram Reel • Product tagging • Brand mention • Optional story support",
+      badge: "Sponsored Post"
     },
     {
       id: "reviews",
       icon: <ShoppingBag size={18} className="text-brand-rose" />,
-      title: "Unbiased Wear-Tests & Reviews",
-      desc: "An elaborate, unedited showcase of your product. Detailing ingredient feel, skin texture settling, water resistance, and natural transfer tests over 8 hours.",
-      deliverables: "1x structured Reel review, high-res swatch photographs.",
-      badge: "Pure Follower Trust"
+      title: "Honest Product Reviews",
+      desc: "Share genuine experiences with products while maintaining transparency and audience trust.",
+      deliverables: "Review Reel • Product demonstration • Beauty-focused feedback • Optional story coverage",
+      badge: "Product Review"
     },
     {
       id: "affiliate",
       icon: <Radio size={18} className="text-brand-rose" />,
-      title: "Comment-to-Link Campaigns",
-      desc: "Utilize built-in DM automation. Followers who comment a specific keyword automatically receive your brand's affiliate link & checkout discount codes in seconds.",
-      deliverables: "Custom keywords, tracking dashboard setup, direct link-clicks.",
-      badge: "Instant ROI Funnel"
+      title: "Affiliate Partnerships",
+      desc: "For brands interested in long-term collaboration opportunities, affiliate partnerships allow product recommendations to be shared through trusted content and authentic experiences.",
+      deliverables: "Affiliate content integration • Product recommendations • Long-term promotional opportunities",
+      badge: "Affiliate Collaboration"
     },
     {
       id: "ambassador",
       icon: <Milestone size={18} className="text-brand-rose" />,
-      title: "Long-Term Ambassadorship",
-      desc: "Elevate your brand with consistent monthly coverage. Features recurring skincare prep insertions, product empties updates, and premium placement across season campaigns.",
-      deliverables: "3x dedicated Reels, 12x Stories over 90 days, exclusive industry exclusivity.",
-      badge: "Premium Authority"
+      title: "Long-Term Brand Partnerships",
+      desc: "Build consistent visibility through recurring collaborations and ongoing content integration.",
+      deliverables: "Beauty Brands • Skincare Companies • Cosmetics Launches • Product Campaigns",
+      badge: "Brand Ambassadorship"
     }
   ];
 
@@ -132,13 +132,13 @@ export default function TrustCollab({ onSelectService }: TrustCollabProps) {
         <div>
           <div className="text-center max-w-2xl mx-auto mb-16" id="collab-header">
             <span className="font-mono text-xs text-brand-rose uppercase tracking-[0.25em] font-bold block mb-2">
-              BRAND COLLABORATION HUB
+              BRAND COLLABORATIONS
             </span>
             <h2 className="font-serif text-3xl lg:text-4xl text-brand-dark font-semibold">
               Let&apos;s Create Something Beautiful Together
             </h2>
             <p className="font-sans text-xs sm:text-sm text-brand-dark/70 mt-3">
-              Explore custom deliverables engineered to fit into modern creator marketing channels. Select an option to configure a custom campaign proposal.
+              I love discovering products that genuinely add value to my audience. Whether you&apos;re launching a new beauty product, looking for authentic creator content, or looking for a long-term partnership, I&apos;d love to explore how we can work together.
             </p>
             <div className="w-12 h-1 bg-brand-blush/80 mx-auto mt-4 rounded-full" />
           </div>
@@ -191,20 +191,32 @@ export default function TrustCollab({ onSelectService }: TrustCollabProps) {
               <div className="bg-brand-dark text-white p-6 rounded-3xl text-left border border-white/5 shadow-xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-brand-blush/10 rounded-full blur-2xl" />
                 
-                <h3 className="font-serif text-lg font-bold mb-3">Our Campaign Standards</h3>
+                <h3 className="font-serif text-base font-bold mb-4 font-normal">Why Brands Choose To Work With Me</h3>
                 
                 <ul className="space-y-4 text-xs text-stone-200 font-sans">
                   <li className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-brand-rose mt-1.5 shrink-0" />
-                    <span><strong>Paced &amp; Sound-Synced:</strong> We map target sounds and pacing to maintain retention indexes past the vital 3-second mark.</span>
+                    <span className="text-brand-rose font-bold shrink-0">✓</span>
+                    <span>Authentic content creation</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-brand-rose mt-1.5 shrink-0" />
-                    <span><strong>Complete Transparency:</strong> Follows FTC labeling requirements while presenting product utility beautifully.</span>
+                    <span className="text-brand-rose font-bold shrink-0">✓</span>
+                    <span>Beauty-focused audience</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-brand-rose mt-1.5 shrink-0" />
-                    <span><strong>UGC Expertise:</strong> Deliver clean file variations suited for social vertical ad grids.</span>
+                    <span className="text-brand-rose font-bold shrink-0">✓</span>
+                    <span>Honest recommendations</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-brand-rose font-bold shrink-0">✓</span>
+                    <span>Consistent content publishing</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-brand-rose font-bold shrink-0">✓</span>
+                    <span>Professional communication</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-brand-rose font-bold shrink-0">✓</span>
+                    <span>Long-term collaboration mindset</span>
                   </li>
                 </ul>
 
@@ -214,17 +226,17 @@ export default function TrustCollab({ onSelectService }: TrustCollabProps) {
                 </div>
               </div>
 
-              {/* Instant proposal trust card */}
+              {/* Instant proposal info card */}
               <div className="bg-white p-6 rounded-3xl text-left border border-brand-blush/25 shadow-sm">
                 <span className="font-mono text-[9px] uppercase font-bold text-brand-rose tracking-widest block mb-1">
-                  SECURE BOOKING GAUGE
+                  COLLABORATION INQUIRY
                 </span>
-                <p className="font-serif text-md font-semibold text-brand-dark mb-2">Ready to align your brand?</p>
+                <p className="font-serif text-md font-semibold text-brand-dark mb-2">Ready to work together?</p>
                 <p className="font-sans text-xs text-brand-dark/70 leading-relaxed mb-4">
-                  Select a category or campaign framework on the left. The custom details will auto-fill in our contact form below so we can generate a prompt contract proposal.
+                  Select a category on the left. The custom details will fill in our contact form below so we can discuss a customized proposal.
                 </p>
                 <div className="w-full bg-brand-sand py-2 px-3 rounded-xl border border-brand-blush/10 flex items-center justify-between text-[10px] font-mono">
-                  <span className="text-brand-dark/60 font-bold">Standard Contact turnaround</span>
+                  <span className="text-brand-dark/60 font-bold">Standard response turnaround</span>
                   <span className="text-brand-rose font-bold uppercase">&lt; 24 HOURS</span>
                 </div>
               </div>

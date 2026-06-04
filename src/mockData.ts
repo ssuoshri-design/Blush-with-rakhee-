@@ -117,7 +117,7 @@ export const initialReels: InstagramReel[] = [
   {
     id: "reel-5",
     title: "GRWM: Chatty Monochromatic Peach Makeup & Life Update",
-    thumbnail: "https://images.unsplash.com/photo-1522337660859-02f69250a1d0?auto=format&fit=crop&q=80&w=600",
+    thumbnail: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&q=80&w=600",
     category: "GRWM",
     views: 8100,
     likes: 620,

@@ -56,143 +56,147 @@ export default function MediaKitAudit({ onRequestCollab, incrementDownloads, dow
         <div className="mb-24">
           <div className="text-center max-w-2xl mx-auto mb-16" id="mediakit-header">
             <span className="font-mono text-xs text-brand-rose uppercase tracking-[0.25em] font-bold block mb-2">
-              CREATOR MEDIA PACK
+              Creator Media Kit
             </span>
-            <h2 className="font-serif text-3xl lg:text-4xl text-brand-dark font-semibold">
-              Media Kit &amp; Rate Cards
+            <h2 className="font-serif text-2xl lg:text-3xl text-brand-dark font-semibold">
+              Creator Media Kit
             </h2>
+            <p className="font-sans text-xs sm:text-sm text-brand-dark/70 mt-3">
+              A growing beauty creator focused on authentic recommendations, beauty education, and building trust with a beauty-focused audience.
+            </p>
             <div className="w-12 h-1 bg-brand-blush/80 mx-auto mt-4 rounded-full" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch" id="mediakit-container">
             
             {/* Visual Media Kit Presentation Slide Deck (Left) */}
-            <div className="lg:col-span-7 bg-brand-sand/45 rounded-3xl p-6 lg:p-8 border border-brand-blush/20 text-left flex flex-col justify-between" id="mediakit-viewport">
+            <div className="lg:col-span-6 bg-brand-sand/45 rounded-3xl p-6 lg:p-8 border border-brand-blush/20 text-left flex flex-col justify-between" id="mediakit-viewport">
               <div>
                 <div className="flex items-center justify-between border-b border-brand-blush/25 pb-4 mb-6">
                   <div>
-                    <h3 className="font-serif text-xl font-bold text-brand-dark">Media Kit Presentation</h3>
-                    <p className="text-[11px] font-mono text-brand-rose uppercase tracking-widest font-bold">Blush With Rakhee Est. 2026</p>
+                    <h3 className="font-serif text-lg font-bold text-brand-dark">About My Content</h3>
+                    <p className="text-[11px] font-mono text-brand-rose uppercase tracking-widest font-bold">Blush With Rakhee</p>
                   </div>
                   <span className="font-sans text-[11px] text-brand-rose bg-white border border-brand-blush/30 px-3 py-1 rounded-full font-bold">
-                    Official Active Version
+                    Growing Community
                   </span>
                 </div>
 
-                {/* Slides content preview */}
-                <div className="space-y-4">
-                  <div className="bg-white p-4 rounded-2xl border border-brand-blush/10 flex items-start gap-3.5">
-                    <span className="font-mono text-sm text-brand-rose font-bold">Slide 1.</span>
-                    <div>
-                      <p className="font-serif text-sm font-bold text-brand-dark">Platform Demographics</p>
-                      <p className="font-sans text-xs text-brand-dark/75 mt-0.5">84% Female audience, ages 18-34, concentrated heavily in South-Asian makeup preferences, premium cosmetics, organic hydration remedies, and transition wear-tests.</p>
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-serif text-xs font-bold text-brand-dark uppercase tracking-wider mb-3">Beauty Content Categories</h4>
+                    <ul className="space-y-2 text-xs text-brand-dark/80 font-sans">
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-rose" />
+                        <span>Makeup Tutorials</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-rose" />
+                        <span>Product Reviews</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-rose" />
+                        <span>Beauty Hacks</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-rose" />
+                        <span>Skincare Recommendations</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-rose" />
+                        <span>GRWM Content</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-rose" />
+                        <span>Beauty Transformations</span>
+                      </li>
+                    </ul>
                   </div>
 
-                  <div className="bg-white p-4 rounded-2xl border border-brand-blush/10 flex items-start gap-3.5">
-                    <span className="font-mono text-sm text-brand-rose font-bold">Slide 2.</span>
-                    <div>
-                      <p className="font-serif text-sm font-bold text-brand-dark">Reels Performance Logs</p>
-                      <p className="font-sans text-xs text-brand-dark/75 mt-0.5">Average views clocking at 8,400+ per asset. Engagement rate peaking at 8.8%, placing our micro-channel in the top 5% bracket for micro beauty creators.</p>
-                    </div>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-2xl border border-brand-blush/10 flex items-start gap-3.5">
-                    <span className="font-mono text-sm text-brand-rose font-bold">Slide 3.</span>
-                    <div>
-                      <p className="font-serif text-sm font-bold text-brand-dark">Integrity Pledge</p>
-                      <p className="font-sans text-xs text-brand-dark/75 mt-0.5">Strict zero-bot assurance, zero comment group optimization, real active clicks, and full Google Analytics Campaign tracking spreadsheets shared upon proposal acceptance.</p>
-                    </div>
+                  <div>
+                    <h4 className="font-serif text-xs font-bold text-brand-dark uppercase tracking-wider mb-3">Audience Interests</h4>
+                    <ul className="space-y-2 text-xs text-brand-dark/80 font-sans">
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-rose" />
+                        <span>Beauty Products</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-rose" />
+                        <span>Makeup</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-rose" />
+                        <span>Skincare</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-rose" />
+                        <span>Product Recommendations</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-rose" />
+                        <span>Beauty Tutorials</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-rose" />
+                        <span>Lifestyle Content</span>
+                      </li>
+                    </ul>
                   </div>
                 </div>
               </div>
 
-              {/* Download CTA Bar */}
-              <div className="mt-8 pt-6 border-t border-brand-blush/15 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-left">
-                  <p className="font-sans text-xs text-brand-dark/65">
-                    Downloaded <strong className="font-mono text-brand-rose">{downloadCount} times</strong> this week
-                  </p>
-                  <p className="text-[10px] text-brand-dark/50">Format: High-Res Interactive PDF</p>
-                </div>
-
-                <div className="flex gap-2.5 w-full sm:w-auto">
-                  <button
-                    onClick={handleDownload}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-brand-rose hover:bg-brand-dark text-white px-5 py-3 rounded-full text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer shadow-sm hover:scale-102"
-                    id="download-media-kit-btn"
-                  >
-                    <Download size={13} />
-                    <span>{downloadSuccess ? "Downloaded!" : "Download Media Kit"}</span>
-                  </button>
-                </div>
+              <div className="mt-8 pt-6 border-t border-brand-blush/15 text-xs text-brand-dark/60 font-sans italic">
+                Detailed audience insights and collaboration information available upon request.
               </div>
             </div>
 
-            {/* Price Lists Rate Sheets with Tabs (Right) */}
-            <div className="lg:col-span-5 bg-brand-dark text-white rounded-3xl p-6 lg:p-8 border border-white/5 shadow-2xl flex flex-col justify-between" id="rates-sheet">
+            {/* Price Lists Rate Sheets (Right) */}
+            <div className="lg:col-span-6 bg-brand-dark text-white rounded-3xl p-6 lg:p-8 border border-white/5 shadow-2xl flex flex-col justify-between" id="rates-sheet">
               <div>
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h3 className="font-serif text-xl font-bold">Campaign Rates</h3>
-                    <p className="text-[10px] text-brand-blush font-mono uppercase tracking-widest font-semibold mt-0.5">Rates updated June 2026</p>
-                  </div>
+                <h3 className="font-serif text-xl font-bold mb-2">Collaboration Requests</h3>
+                <p className="text-[11px] text-brand-blush font-mono uppercase tracking-widest font-semibold mb-6">Custom Campaign Inquiry</p>
+                
+                <p className="font-sans text-xs text-stone-200 mb-4 leading-relaxed">
+                  Every campaign is unique. Collaboration pricing depends on:
+                </p>
 
-                  <div className="flex gap-1.5 bg-white/5 p-1 rounded-lg">
-                    <button
-                      onClick={() => setActiveRateTab("standard")}
-                      className={`px-2.5 py-1 rounded text-[9px] uppercase tracking-wider font-bold cursor-pointer transition-colors ${activeRateTab === "standard" ? "bg-brand-rose text-white" : "text-stone-300 hover:text-white"}`}
-                    >
-                      Single
-                    </button>
-                    <button
-                      onClick={() => setActiveRateTab("packages")}
-                      className={`px-2.5 py-1 rounded text-[9px] uppercase tracking-wider font-bold cursor-pointer transition-colors ${activeRateTab === "packages" ? "bg-brand-rose text-white" : "text-stone-300 hover:text-white"}`}
-                    >
-                      Packages
-                    </button>
-                  </div>
-                </div>
+                <ul className="space-y-3.5 text-xs text-stone-200 font-sans">
+                  <li className="flex items-center gap-2.5">
+                    <span className="text-brand-rose font-bold text-sm">•</span>
+                    <span>Content format</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <span className="text-brand-rose font-bold text-sm">•</span>
+                    <span>Deliverables required</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <span className="text-brand-rose font-bold text-sm">•</span>
+                    <span>Usage rights</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <span className="text-brand-rose font-bold text-sm">•</span>
+                    <span>Campaign duration</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <span className="text-brand-rose font-bold text-sm">•</span>
+                    <span>Brand requirements</span>
+                  </li>
+                </ul>
 
-                {/* Vertical rate lines */}
-                <div className="space-y-4 text-left">
-                  {(activeRateTab === "standard" ? standardRates : packagesRates).map((rate, ind) => (
-                    <div 
-                      key={ind} 
-                      className={`p-3.5 rounded-2xl relative border transition-all ${rate.popular ? 'bg-brand-rose/10 border-brand-rose' : 'bg-white/5 border-white/5 hover:border-white/10'}`}
-                    >
-                      {rate.popular && (
-                        <span className="absolute -top-2 right-4 bg-brand-rose text-white font-mono text-[7px] uppercase tracking-widest px-2 py-0.5 rounded-full font-bold">
-                          Most Requested
-                        </span>
-                      )}
-
-                      <div className="flex justify-between items-start">
-                        <p className="font-serif text-sm font-bold pr-12 line-clamp-1">{rate.deliverable}</p>
-                        <p className="font-mono text-sm font-bold text-brand-blush shrink-0">{formatPrice(rate.price)}</p>
-                      </div>
-
-                      <div className="flex justify-between items-center text-[10px] text-stone-300 mt-2 font-sans-serif border-t border-white/5 pt-2">
-                        <span>Turnaround time: <strong>{rate.timeline}</strong></span>
-                        <button
-                          onClick={onRequestCollab}
-                          className="text-brand-blush hover:underline uppercase tracking-wider font-bold font-mono text-[8px] cursor-pointer"
-                        >
-                          Book deliverable &rarr;
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-
-              <div className="mt-8 pt-4 border-t border-white/10 text-left text-xs bg-white/5 p-4 rounded-2xl">
-                <p className="font-sans text-[11px] text-stone-300 leading-relaxed font-light">
-                  *All prices list baseline estimates and include physical product receipt. Standard usage rights last 30 days unless specified otherwise. We operate secure contracts via digital agreements.
+                <p className="font-sans text-xs text-stone-300 mt-6 leading-relaxed">
+                  Please submit your collaboration request and campaign details to receive a customized proposal.
                 </p>
               </div>
 
+              <div className="mt-8">
+                <button
+                  onClick={onRequestCollab}
+                  className="w-full inline-flex items-center justify-center gap-2 bg-brand-rose hover:bg-brand-dark text-white px-5 py-3 rounded-full text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer shadow-sm hover:scale-102"
+                  id="request-collab-btn"
+                >
+                  Request Collaboration
+                </button>
+              </div>
             </div>
 
           </div>
