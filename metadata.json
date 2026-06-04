@@ -1,0 +1,6 @@
+{
+  "name": "Blush With Rakhee",
+  "description": "Premium luxury creator business platform and operating system for beauty creator Rakhee.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
