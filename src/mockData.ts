@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { InstagramReel, CollabLead, Testimonial, ContentPillar, AffiliateItem, NewsletterSubscriber, FAQItem, CreatorStats } from "./types";
+import { InstagramReel, CollabLead, Testimonial, ContentPillar, AffiliateItem, NewsletterSubscriber, FAQItem, CreatorStats, CreatorMessage } from "./types";
 
 export const initialStats: CreatorStats = {
   followers: 1009,
@@ -347,3 +347,60 @@ export const initialFAQs: FAQItem[] = [
     answer: "We use a premium affiliate tracking portal. For brand sponsorships, we activate Instagram Automations (e.g., commenting 'GLOW' automatically DMs the tracking link directly to the follower), yielding click-through-rates up to 4x higher than standard link-in-bio clicks.",
   },
 ];
+
+export const initialCreatorMessages: CreatorMessage[] = [
+  {
+    id: "msg-1",
+    senderName: "Pooja Sharma",
+    senderHandle: "@pooja_beautyglow",
+    messageText: "Where did you get that warm gold eye shade crease? In love with this transition!",
+    platform: "Instagram Comment",
+    targetPost: "South Asian Soft Glam: Warm Gold Eye & Dewy Blush",
+    date: "2026-06-04",
+    replied: true,
+    replyText: "Thank you Pooja! That is indeed the Charlotte Tilbury Eyes to Mesmerise in Amber Gold. Link in my ShopMy page under Glow Favorites!"
+  },
+  {
+    id: "msg-2",
+    senderName: "Nisha Patel",
+    senderHandle: "@nisha_nyc",
+    messageText: "GLOW",
+    platform: "Instagram Comment",
+    targetPost: "Honest Wear Test: Viral Hydrating Tinted Moisturizer",
+    keywordTriggered: "GLOW",
+    date: "2026-06-03",
+    replied: false // Will trigger automatic DM automation
+  },
+  {
+    id: "msg-3",
+    senderName: "Sarah Al-Thani",
+    senderHandle: "@sarah.althani",
+    messageText: "Hi Rakhee! Love your dewy prep tutorials. Do you think the Laneige tint holds up in humid gulf weather?",
+    platform: "Instagram DM",
+    date: "2026-06-03",
+    replied: false
+  },
+  {
+    id: "msg-4",
+    senderName: "Deepa Nair",
+    senderHandle: "Deepa Nair (FB)",
+    messageText: "Loved the soft peach glams of yours. Keep sharing these honest tutorials for South Asian women, we really appreciate you!",
+    platform: "Facebook Message",
+    date: "2026-06-02",
+    replied: true,
+    replyText: "Deepa, thank you so much! Comments like yours keep me going. I promise to keep tests 100% honest always!"
+  },
+  {
+    id: "msg-5",
+    senderName: "Kriti Verma",
+    senderHandle: "@kriti_v",
+    messageText: "GLOW",
+    platform: "Instagram Comment",
+    targetPost: "3 Essential Concealer Placements for Instant Face-Lift",
+    keywordTriggered: "GLOW",
+    date: "2026-06-01",
+    replied: true,
+    replyText: "Automated DM Dispatched: 'Hey beautiful! Here is my exact concealer placement layout sheet + my ShopMy products link: shopmy.us/blushwithrakhee/concealer-glow'"
+  }
+];
+

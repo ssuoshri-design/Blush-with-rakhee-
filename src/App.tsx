@@ -6,7 +6,6 @@ import Pillars from "./components/Pillars";
 import Showcase from "./components/Showcase";
 import TrustCollab from "./components/TrustCollab";
 import MediaKitAudit from "./components/MediaKitAudit";
-import FunnelRoadmap from "./components/FunnelRoadmap";
 import NewsletterContact from "./components/NewsletterContact";
 import AdminOS from "./components/AdminOS";
 
@@ -16,14 +15,20 @@ import {
   initialReels, 
   initialLeads, 
   initialAffiliateProducts, 
-  initialNewsletterSubscribers 
+  initialNewsletterSubscribers,
+  initialCreatorMessages
 } from "./mockData";
-import { CollabLead, InstagramReel, AffiliateItem, NewsletterSubscriber, CreatorStats } from "./types";
-import { AlertCircle, CheckCircle2, Heart, HeartHandshake, Instagram, Mail, MessageSquare } from "lucide-react";
+import { CollabLead, InstagramReel, AffiliateItem, NewsletterSubscriber, CreatorStats, CreatorMessage } from "./types";
+import { AlertCircle, CheckCircle2, Heart, HeartHandshake, Instagram, Mail, MessageSquare, Facebook, Lock } from "lucide-react";
 
 export default function App() {
   // Dual layout mode: "public" handles the consumer branding, "admin" is the Creator operating system
   const [currentMode, setMode] = useState<"public" | "admin">("public");
+
+  // Admin login dialog authentication states
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [adminPasswordInput, setAdminPasswordInput] = useState("");
+  const [adminLoginError, setAdminLoginError] = useState(false);
 
   // CRM State core
   const [leads, setLeads] = useState<CollabLead[]>(() => {
@@ -55,11 +60,31 @@ export default function App() {
     return saved ? JSON.parse(saved) : initialNewsletterSubscribers;
   });
 
+  // Direct follower comments, DMs & texts tracking
+  const [messages, setMessages] = useState<CreatorMessage[]>(() => {
+    const saved = localStorage.getItem("blush_messages");
+    return saved ? JSON.parse(saved) : initialCreatorMessages;
+  });
+
   // Downloads tracking count
   const [downloadCount, setDownloadCount] = useState<number>(() => {
     const saved = localStorage.getItem("blush_downloads");
     return saved ? Number(saved) : 48;
   });
+
+  // Dynamic pricing converter (INR vs USD)
+  const [currency, setCurrency] = useState<"USD" | "INR">(() => {
+    const saved = localStorage.getItem("blush_currency");
+    return saved === "INR" ? "INR" : "USD";
+  });
+
+  const formatPrice = (usdAmount: number, digits: number = 0): string => {
+    if (currency === "INR") {
+      const inrAmount = usdAmount * 83; // 1 USD = 83 INR
+      return `₹${Math.round(inrAmount).toLocaleString("en-IN")}`;
+    }
+    return `$${usdAmount.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
+  };
 
   // High-fidelity active selection feedback mapping
   const [selectedCampaignType, setSelectedCampaignType] = useState<string>("Dedicated Instagram Sponsored Reel");
@@ -86,8 +111,17 @@ export default function App() {
   }, [subscribers]);
 
   useEffect(() => {
+    localStorage.setItem("blush_messages", JSON.stringify(messages));
+  }, [messages]);
+
+
+  useEffect(() => {
     localStorage.setItem("blush_downloads", String(downloadCount));
   }, [downloadCount]);
+
+  useEffect(() => {
+    localStorage.setItem("blush_currency", currency);
+  }, [currency]);
 
   // Helpers to adjust CRM levels
   const addLead = (newLead: CollabLead) => {
@@ -179,6 +213,8 @@ export default function App() {
         currentMode={currentMode} 
         setMode={setMode} 
         scrollToSection={scrollToSection} 
+        currency={currency}
+        setCurrency={setCurrency}
       />
 
       {/* Main Core Router Screen mapping */}
@@ -212,15 +248,13 @@ export default function App() {
               }} 
             />
 
-            {/* Sections 8 & 9: PDF Media Kit Rates Sheets & Real audits of technical setups */}
+            {/* Sections 8 & 9: PDF Media Kit Rates Sheets */}
             <MediaKitAudit 
               onRequestCollab={() => scrollToSection("contact")}
               incrementDownloads={incrementDownloads}
               downloadCount={downloadCount}
+              formatPrice={formatPrice}
             />
-
-            {/* Sections 10 & 11: DM Key phrases automation & Monetization timeline projection */}
-            <FunnelRoadmap />
 
             {/* Sections 12, 13, 14 & 15: Mailing lists updates, Testimonial cards list, FAQs Accordions, CRM Proposal Form */}
             <NewsletterContact 
@@ -228,6 +262,7 @@ export default function App() {
               onContactSubmit={handleContactSubmit}
               selectedCampaignType={selectedCampaignType}
               setSelectedCampaignType={setSelectedCampaignType}
+              currency={currency}
             />
           </div>
         ) : (
@@ -248,6 +283,10 @@ export default function App() {
               simulateClicks={simulateTrafficClicks}
               subscribers={subscribers}
               downloadCount={downloadCount}
+              messages={messages}
+              setMessages={setMessages}
+              currency={currency}
+              formatPrice={formatPrice}
             />
           </div>
         )}
@@ -264,15 +303,20 @@ export default function App() {
             <p className="font-sans text-xs text-stone-300 leading-relaxed max-w-xs">
               A high-polished beauty creator brand ecosystem, tracking metrics, automating affiliate conversions, and delivering top-tier UGC content draft materials.
             </p>
-            <div className="flex items-center gap-3">
-              <a href="https://instagram.com/blushwithrakhee" target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-brand-rose transition-colors flex items-center justify-center text-stone-200">
-                <Instagram size={14} />
-              </a>
-              <a href="mailto:ssuoshri@gmail.com" className="w-8 h-8 rounded-full bg-white/5 hover:bg-brand-rose transition-colors flex items-center justify-center text-stone-200">
-                <Mail size={14} />
-              </a>
-              <a href="https://wa.me/15550192301" target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-brand-rose transition-colors flex items-center justify-center text-stone-200">
-                <MessageSquare size={14} />
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <a href="https://www.instagram.com/blushwithrakhee?igsh=MXBjMGFxZjN1cWR0OQ==" target="_blank" rel="noreferrer" title="Instagram" className="w-8 h-8 rounded-full bg-white/5 hover:bg-brand-rose transition-colors flex items-center justify-center text-stone-200">
+                  <Instagram size={14} />
+                </a>
+                <a href="https://www.facebook.com/share/1CmrEHVJgH/" target="_blank" rel="noreferrer" title="Facebook" className="w-8 h-8 rounded-full bg-white/5 hover:bg-brand-rose transition-colors flex items-center justify-center text-stone-200">
+                  <Facebook size={14} />
+                </a>
+                <a href="mailto:rakhee.chakraborty1985@gmail.com" title="Email" className="w-8 h-8 rounded-full bg-white/5 hover:bg-brand-rose transition-colors flex items-center justify-center text-stone-200">
+                  <Mail size={14} />
+                </a>
+              </div>
+              <a href="mailto:rakhee.chakraborty1985@gmail.com" className="font-mono text-[10.5px] text-stone-400 hover:text-brand-rose transition-colors block leading-none">
+                rakhee.chakraborty1985@gmail.com
               </a>
             </div>
           </div>
@@ -285,7 +329,6 @@ export default function App() {
               <button onClick={() => { setMode("public"); setTimeout(() => scrollToSection("portfolio"), 100); }} className="hover:text-brand-blush hover:underline cursor-pointer block text-left">Campaign Showcase</button>
               <button onClick={() => { setMode("public"); setTimeout(() => scrollToSection("mediakit"), 100); }} className="hover:text-brand-blush hover:underline cursor-pointer block text-left">Media Kit &amp; Rates</button>
               <button onClick={() => { setMode("public"); setTimeout(() => scrollToSection("contact"), 100); }} className="hover:text-brand-blush hover:underline cursor-pointer block text-left">Partnership Form</button>
-              <button onClick={() => setMode(currentMode === "public" ? "admin" : "public")} className="hover:text-brand-blush hover:underline cursor-pointer font-bold block text-left">Private OS portal</button>
             </div>
           </div>
 
@@ -299,12 +342,85 @@ export default function App() {
         </div>
 
         <div className="max-w-7xl mx-auto border-t border-white/5 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-stone-400 font-mono gap-4">
-          <span>&copy; {new Date().getFullYear()} Blush With Rakhee. All Rights Reserved.</span>
+          <div className="flex items-center gap-1.5">
+            <span>&copy; {new Date().getFullYear()} Blush With Rakhee. All Rights Reserved.</span>
+            {/* Invisibly small 20% opacity block lock icon system trigger */}
+            <button
+              onClick={() => {
+                setShowAdminLogin(true);
+                setAdminPasswordInput("");
+                setAdminLoginError(false);
+              }}
+              className="opacity-20 hover:opacity-100 transition-opacity cursor-pointer p-1 text-white hover:text-brand-rose"
+              title="Admin Portal"
+            >
+              <Lock size={11} />
+            </button>
+          </div>
           <span className="flex items-center gap-1">
             Engineered with <Heart size={10} fill="#B76E79" className="text-brand-rose" /> as a Premium Creator Operating System.
           </span>
         </div>
       </footer>
+
+      {/* SECURE ADMIN AUTHORIZATION OVERLAY MODAL */}
+      {showAdminLogin && (
+        <div className="fixed inset-0 bg-brand-dark/90 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-brand-blush/35 p-8 max-w-sm w-full shadow-2xl relative animate-fadeIn text-left">
+            <button 
+              onClick={() => setShowAdminLogin(false)} 
+              className="absolute top-4 right-4 text-stone-400 hover:text-brand-dark font-sans text-sm font-bold p-1"
+            >
+              ✕
+            </button>
+            <div className="w-12 h-12 rounded-full bg-brand-sand/50 text-brand-rose flex items-center justify-center mx-auto mb-4">
+              <Lock size={20} />
+            </div>
+            <h3 className="font-serif text-lg font-bold text-center text-brand-dark mb-1">
+              Authorized OS Identity Verification
+            </h3>
+            <p className="font-sans text-[11px] text-center text-stone-500 mb-6 leading-relaxed">
+              Please enter the administrator passphrase to gain secure root access to the Creator Operating System.
+            </p>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              if (adminPasswordInput === "Rakhee@1985") {
+                setMode("admin");
+                setShowAdminLogin(false);
+                setAdminLoginError(false);
+                setAdminPasswordInput("");
+              } else {
+                setAdminLoginError(true);
+              }
+            }} className="space-y-4">
+              <input 
+                type="password"
+                required
+                placeholder="••••••••"
+                value={adminPasswordInput}
+                onChange={(e) => {
+                  setAdminPasswordInput(e.target.value);
+                  if (adminLoginError) setAdminLoginError(false);
+                }}
+                className={`w-full bg-stone-50 border ${adminLoginError ? "border-red-400 focus:ring-red-400" : "border-brand-blush/30 focus:ring-brand-rose"} font-mono text-center tracking-widest text-sm px-4 py-3 rounded-2xl focus:outline-none transition-all text-brand-dark`}
+                autoFocus
+              />
+              {adminLoginError && (
+                <p className="text-[10px] text-red-500 font-sans font-bold flex items-center justify-center gap-1">
+                  <AlertCircle size={10} />
+                  <span>Invalid Administrator Passphrase</span>
+                </p>
+              )}
+              <button
+                type="submit"
+                className="w-full bg-brand-dark hover:bg-brand-rose text-white text-xs font-bold uppercase tracking-wider py-3 rounded-2xl transition-colors cursor-pointer"
+              >
+                Authenticate Identity &rarr;
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );

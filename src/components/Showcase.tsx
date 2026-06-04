@@ -287,7 +287,7 @@ export default function Showcase() {
                   Currently playing simulator: <strong>{activeReel.category} Channel</strong>
                 </p>
                 <a
-                  href="https://instagram.com/blushwithrakhee"
+                  href="https://www.instagram.com/blushwithrakhee?igsh=MXBjMGFxZjN1cWR0OQ=="
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 text-xs text-brand-rose hover:text-white font-semibold uppercase tracking-wider cursor-pointer"

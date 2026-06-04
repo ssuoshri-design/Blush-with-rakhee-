@@ -94,3 +94,17 @@ export interface CreatorStats {
   monthlyReach: number;
   averageViews: number;
 }
+
+export interface CreatorMessage {
+  id: string;
+  senderName: string;
+  senderHandle: string;
+  messageText: string;
+  platform: "Instagram Comment" | "Instagram DM" | "Facebook Message" | "WhatsApp Chat";
+  targetPost?: string;
+  keywordTriggered?: string;
+  date: string;
+  replied: boolean;
+  replyText?: string;
+}
+

@@ -6,7 +6,7 @@
 import React, { useState } from "react";
 import { 
   Mail, Star, Send, ChevronDown, ChevronUp, Check, 
-  MessageSquare, HelpCircle, Instagram, Sparkles, Plus, Trash2, CheckCircle2 
+  MessageSquare, HelpCircle, Instagram, Sparkles, Plus, Trash2, CheckCircle2, Facebook 
 } from "lucide-react";
 import { initialFAQs, initialTestimonials } from "../mockData";
 import { CollabLead, NewsletterSubscriber } from "../types";
@@ -16,13 +16,15 @@ interface NewsletterContactProps {
   onContactSubmit: (lead: Omit<CollabLead, "id" | "date" | "status">) => void;
   selectedCampaignType?: string;
   setSelectedCampaignType?: (type: string) => void;
+  currency?: "USD" | "INR";
 }
 
 export default function NewsletterContact({ 
   onNewsletterSubmit, 
   onContactSubmit, 
   selectedCampaignType = "", 
-  setSelectedCampaignType 
+  setSelectedCampaignType,
+  currency = "USD"
 }: NewsletterContactProps) {
   
   // Newsletter state
@@ -82,13 +84,18 @@ export default function NewsletterContact({
     e.preventDefault();
     if (!contactName || !contactBrand || !contactEmail) return;
 
+    // Convert to USD base representation if submitted in INR
+    const finalBudget = currency === "INR" 
+      ? Math.round(Number(contactBudget) / 83) 
+      : Number(contactBudget);
+
     onContactSubmit({
       brandName: contactBrand,
       contactPerson: contactName,
       email: contactEmail,
       phone: contactPhone,
       website: contactWebsite,
-      budget: Number(contactBudget),
+      budget: finalBudget,
       campaignType: selectedCampaignType || "Sponsored Reel & Story Integration",
       campaignDetails: contactDetails,
       attachmentName: attachedFile || undefined
@@ -332,56 +339,58 @@ export default function NewsletterContact({
                 <p className="font-serif text-xs font-bold text-brand-dark">Direct Live Connections</p>
                 <p className="font-sans text-[11px] text-stone-500 mt-0.5">Prefer direct chat channels over proposals? Tap below:</p>
                 
-                <div className="flex gap-2 mt-3">
+                <div className="flex flex-col sm:flex-row gap-2 mt-3">
                   <a 
-                    href="https://instagram.com/blushwithrakhee" 
+                    href="https://www.instagram.com/blushwithrakhee?igsh=MXBjMGFxZjN1cWR0OQ==" 
                     target="_blank" 
                     rel="noreferrer"
                     className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 bg-brand-sand hover:bg-brand-rose hover:text-white rounded-xl text-xs font-semibold text-brand-rose transition-all cursor-pointer border border-brand-blush/20"
                   >
                     <Instagram size={13} />
-                    <span>Instagram DM</span>
+                    <span>Instagram</span>
                   </a>
                   <a 
-                    href="https://wa.me/15550192301" 
+                    href="https://www.facebook.com/share/1CmrEHVJgH/" 
                     target="_blank" 
                     rel="noreferrer"
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 bg-green-50 hover:bg-green-600 hover:text-white rounded-xl text-xs font-semibold text-green-600 transition-all cursor-pointer border border-green-200"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 bg-blue-50 hover:bg-blue-600 hover:text-white rounded-xl text-xs font-semibold text-blue-600 transition-all cursor-pointer border border-blue-200"
                   >
-                    <MessageSquare size={13} />
-                    <span>WhatsApp Chat</span>
+                    <Facebook size={13} />
+                    <span>Facebook</span>
+                  </a>
+                  <a 
+                    href="mailto:rakhee.chakraborty1985@gmail.com" 
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 bg-stone-50 hover:bg-stone-600 hover:text-white rounded-xl text-xs font-semibold text-stone-600 transition-all cursor-pointer border border-stone-200"
+                  >
+                    <Mail size={13} />
+                    <span>Email Me</span>
                   </a>
                 </div>
               </div>
 
             </div>
 
-            {/* Collaboration Campaign Form (Right lg:col-span-7) */}
+            {/* High-Impact Brands Section Approach (Right lg:col-span-7) */}
             <div className="lg:col-span-7" id="campaign-form-block">
               <div className="bg-white p-6 sm:p-8 rounded-3xl border border-brand-blush/25 shadow-xl text-left" id="collab-proposal-card">
                 
                 <div className="flex items-center justify-between border-b border-brand-blush/15 pb-4 mb-6">
                   <div>
-                    <h3 className="font-serif text-xl font-bold text-brand-dark">Book a Campaign Collaboration</h3>
-                    <p className="text-[10px] text-stone-400 font-mono uppercase tracking-widest mt-0.5 font-bold">Secure proposal generator</p>
+                    <h3 className="font-serif text-xl font-bold text-brand-dark">Brands: Let's Collaborate!</h3>
+                    <p className="text-[10.5px] text-stone-400 font-sans tracking-wide mt-0.5 font-medium">Ready to feature your products? Reach out directly here!</p>
                   </div>
                   <span className="font-sans text-[10px] text-brand-rose bg-brand-sand border border-brand-blush/35 px-2.5 py-0.5 rounded-full font-bold">
-                    Turnaround: &lt; 24h
+                    Reply inside 24h
                   </span>
                 </div>
 
                 {contactSuccess ? (
                   <div className="bg-brand-sand/50 p-8 rounded-2xl border border-brand-rose/30 text-center animate-fadeIn space-y-3">
                     <CheckCircle2 className="text-brand-rose mx-auto" size={36} />
-                    <h4 className="font-serif text-lg font-bold text-brand-dark">Proposal Submitted Successfully!</h4>
+                    <h4 className="font-serif text-lg font-bold text-brand-dark">Pitch Sent Successfully!</h4>
                     <p className="font-sans text-xs text-stone-600 leading-relaxed max-w-lg mx-auto">
-                      Thank you for contacting Blush With Rakhee. Your request has been queued inside our **Creator Operating System CRM**, and a tracking token is assigned to your brand. Rakhee will reach out within 24 hours to arrange an onboarding call!
+                      Thank you so much! Your product campaign request has been sent directly to Rakhee's private planning notes. She will review it during her afternoon break today and get back to you via email within 24 hours.
                     </p>
-                    <div className="pt-2">
-                      <span className="font-mono text-[9px] bg-white border border-brand-blush/40 px-3 py-1 rounded text-brand-rose font-bold">
-                        CRM Lead Status: Pending Review
-                      </span>
-                    </div>
                   </div>
                 ) : (
                   <form onSubmit={submitContact} className="space-y-4">
@@ -454,14 +463,14 @@ export default function NewsletterContact({
                       </div>
 
                       <div>
-                        <label className="block text-[10px] font-mono uppercase tracking-wider text-stone-500 mb-1.5 font-semibold">Campaign Budget (USD)</label>
+                        <label className="block text-[10px] font-mono uppercase tracking-wider text-stone-500 mb-1.5 font-semibold">Campaign Budget ({currency})</label>
                         <div className="relative">
-                          <span className="absolute left-3.5 top-2.5 text-xs text-stone-500">$</span>
+                          <span className="absolute left-3.5 top-2.5 text-xs text-stone-500">{currency === "INR" ? "₹" : "$"}</span>
                           <input 
                             type="number" 
-                            min="100" 
-                            step="50"
-                            placeholder="600"
+                            min={currency === "INR" ? "5000" : "100"} 
+                            step={currency === "INR" ? "1000" : "50"}
+                            placeholder={currency === "INR" ? "50000" : "600"}
                             value={contactBudget}
                             onChange={(e) => setContactBudget(Number(e.target.value))}
                             className="w-full bg-stone-50 border border-brand-blush/20 rounded-xl pl-6 pr-3.5 py-2.5 text-xs focus:ring-1 focus:ring-brand-rose focus:border-brand-rose focus:outline-none"

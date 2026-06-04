@@ -14,9 +14,10 @@ interface MediaKitAuditProps {
   onRequestCollab: () => void;
   incrementDownloads: () => void;
   downloadCount: number;
+  formatPrice: (usdAmount: number, digits?: number) => string;
 }
 
-export default function MediaKitAudit({ onRequestCollab, incrementDownloads, downloadCount }: MediaKitAuditProps) {
+export default function MediaKitAudit({ onRequestCollab, incrementDownloads, downloadCount, formatPrice }: MediaKitAuditProps) {
   const [activeRateTab, setActiveRateTab] = useState<"standard" | "packages">("standard");
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
@@ -168,7 +169,7 @@ export default function MediaKitAudit({ onRequestCollab, incrementDownloads, dow
 
                       <div className="flex justify-between items-start">
                         <p className="font-serif text-sm font-bold pr-12 line-clamp-1">{rate.deliverable}</p>
-                        <p className="font-mono text-sm font-bold text-brand-blush shrink-0">${rate.price}</p>
+                        <p className="font-mono text-sm font-bold text-brand-blush shrink-0">{formatPrice(rate.price)}</p>
                       </div>
 
                       <div className="flex justify-between items-center text-[10px] text-stone-300 mt-2 font-sans-serif border-t border-white/5 pt-2">
@@ -192,145 +193,6 @@ export default function MediaKitAudit({ onRequestCollab, incrementDownloads, dow
                 </p>
               </div>
 
-            </div>
-
-          </div>
-        </div>
-
-        {/* ================= SECTION 9: CURRENT CHALLENGES & SOLUTIONS AUDIT ================= */}
-        <div id="audit" className="pt-8 scroll-mt-20">
-          <div className="text-center max-w-2xl mx-auto mb-16" id="audit-header">
-            <span className="font-mono text-xs text-brand-rose uppercase tracking-[0.25em] font-bold block mb-2">
-              PROFESSIONAL CREATOR AUDIT
-            </span>
-            <h2 className="font-serif text-3xl lg:text-4xl text-brand-dark font-semibold">
-              Current Challenges &amp; Strategic Solutions
-            </h2>
-            <p className="font-sans text-xs sm:text-sm text-brand-dark/70 mt-3">
-              An diagnostic look into Rakhee&apos;s current instagram assets, detailing high-fidelity structural shifts implemented to secure high-ticket brand alignment.
-            </p>
-            <div className="w-12 h-1 bg-brand-blush/80 mx-auto mt-4 rounded-full" />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left" id="audit-cards">
-            {/* Audit Card 1 */}
-            <div className="bg-brand-sand/25 p-6 rounded-3xl border border-brand-blush/20 flex flex-col justify-between hover:border-brand-rose transition-colors duration-300">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="font-mono text-[9px] uppercase tracking-wider font-bold bg-amber-500/10 text-amber-700 px-2.5 py-1 rounded-full flex items-center gap-1">
-                    <AlertTriangle size={10} /> Diagnostic #1
-                  </span>
-                  <span className="font-mono text-xs font-bold text-brand-dark/40">01 / 03</span>
-                </div>
-
-                <h3 className="font-serif text-lg font-bold text-brand-dark mb-2">Instagram Collab Platform Setup</h3>
-                <p className="font-sans text-xs text-stone-600 leading-relaxed mb-4">
-                  <strong>The Challenge:</strong> Many external brand campaigns and creator platforms (like Aspire or Grin) struggle to sync due to faulty Meta authentication linkages.
-                </p>
-
-                <div className="border-t border-brand-blush/10 pt-4 mt-2">
-                  <p className="text-[10px] font-mono uppercase font-bold text-brand-rose tracking-wider mb-2">Implemented Core Solution</p>
-                  <ul className="space-y-2 text-xs text-brand-dark/80 font-sans">
-                    <li className="flex items-start gap-1.5">
-                      <CheckCircle2 size={12} className="text-brand-rose mt-0.5 shrink-0" />
-                      <span>Configure clean Creator Mode setup inside Instagram.</span>
-                    </li>
-                    <li className="flex items-start gap-1.5">
-                      <CheckCircle2 size={12} className="text-brand-rose mt-0.5 shrink-0" />
-                      <span>Bind profile to verified Facebook Creator Page.</span>
-                    </li>
-                    <li className="flex items-start gap-1.5">
-                      <CheckCircle2 size={12} className="text-brand-rose mt-0.5 shrink-0" />
-                      <span>Clear Meta Business Suite verification records.</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-3 border-t border-brand-blush/10 flex items-center justify-between text-[10px] font-mono">
-                <span className="text-stone-500 font-bold">AUDIT STATUS</span>
-                <span className="text-emerald-600 font-bold uppercase tracking-wider bg-emerald-50 px-2 py-0.5 rounded">RESOLVED</span>
-              </div>
-            </div>
-
-            {/* Audit Card 2 */}
-            <div className="bg-brand-sand/25 p-6 rounded-3xl border border-brand-blush/20 flex flex-col justify-between hover:border-brand-rose transition-colors duration-300">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="font-mono text-[9px] uppercase tracking-wider font-bold bg-brand-rose/10 text-brand-rose px-2.5 py-1 rounded-full flex items-center gap-1">
-                    <Sparkles size={10} /> Diagnostic #2
-                  </span>
-                  <span className="font-mono text-xs font-bold text-brand-dark/40">02 / 03</span>
-                </div>
-
-                <h3 className="font-serif text-lg font-bold text-brand-dark mb-2">Reel Pacing &amp; Retention</h3>
-                <p className="font-sans text-xs text-stone-600 leading-relaxed mb-4">
-                  <strong>The Challenge:</strong> Audience drop-off within the first 3 seconds due to slow introductions, lacks of sound synchronization, or visual focal delays.
-                </p>
-
-                <div className="border-t border-brand-blush/10 pt-4 mt-2">
-                  <p className="text-[10px] font-mono uppercase font-bold text-brand-rose tracking-wider mb-2">Implemented Core Solution</p>
-                  <ul className="space-y-2 text-xs text-brand-dark/80 font-sans">
-                    <li className="flex items-start gap-1.5">
-                      <CheckCircle2 size={12} className="text-brand-rose mt-0.5 shrink-0" />
-                      <span>Establish immediate 2-second visual hook showing beauty results.</span>
-                    </li>
-                    <li className="flex items-start gap-1.5">
-                      <CheckCircle2 size={12} className="text-brand-rose mt-0.5 shrink-0" />
-                      <span>Synchronize rapid zoom cut sequences with high-beat audio triggers.</span>
-                    </li>
-                    <li className="flex items-start gap-1.5">
-                      <CheckCircle2 size={12} className="text-brand-rose mt-0.5 shrink-0" />
-                      <span>Voiceover script optimization with zero air pauses.</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-3 border-t border-brand-blush/10 flex items-center justify-between text-[10px] font-mono">
-                <span className="text-stone-500 font-bold">AUDIT STATUS</span>
-                <span className="text-emerald-600 font-bold uppercase tracking-wider bg-emerald-50 px-2 py-0.5 rounded">RESOLVED</span>
-              </div>
-            </div>
-
-            {/* Audit Card 3 */}
-            <div className="bg-brand-sand/25 p-6 rounded-3xl border border-brand-blush/20 flex flex-col justify-between hover:border-brand-rose transition-colors duration-300">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="font-mono text-[9px] uppercase tracking-wider font-bold bg-amber-500/10 text-amber-700 px-2.5 py-1 rounded-full flex items-center gap-1">
-                    <HelpCircle size={10} /> Diagnostic #3
-                  </span>
-                  <span className="font-mono text-xs font-bold text-brand-dark/40">03 / 03</span>
-                </div>
-
-                <h3 className="font-serif text-lg font-bold text-brand-dark mb-2">Affiliate Monetization Pipeline</h3>
-                <p className="font-sans text-xs text-stone-600 leading-relaxed mb-4">
-                  <strong>The Challenge:</strong> High click-through friction. Followers find it difficult to navigate outward bios to lookup swatched colors.
-                </p>
-
-                <div className="border-t border-brand-blush/10 pt-4 mt-2">
-                  <p className="text-[10px] font-mono uppercase font-bold text-brand-rose tracking-wider mb-2">Implemented Core Solution</p>
-                  <ul className="space-y-2 text-xs text-brand-dark/80 font-sans">
-                    <li className="flex items-start gap-1.5">
-                      <CheckCircle2 size={12} className="text-brand-rose mt-0.5 shrink-0" />
-                      <span>Integrate automated direct message keyword triggers (ManyChat standard).</span>
-                    </li>
-                    <li className="flex items-start gap-1.5">
-                      <CheckCircle2 size={12} className="text-brand-rose mt-0.5 shrink-0" />
-                      <span>Embed branded affiliate products in cleanly formatted digital grids.</span>
-                    </li>
-                    <li className="flex items-start gap-1.5">
-                      <CheckCircle2 size={12} className="text-brand-rose mt-0.5 shrink-0" />
-                      <span>Track UTM click telemetry on centralized Creator Dashboard.</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-3 border-t border-brand-blush/10 flex items-center justify-between text-[10px] font-mono">
-                <span className="text-stone-500 font-bold">AUDIT STATUS</span>
-                <span className="text-emerald-600 font-bold uppercase tracking-wider bg-emerald-50 px-2 py-0.5 rounded">RESOLVED</span>
-              </div>
             </div>
 
           </div>

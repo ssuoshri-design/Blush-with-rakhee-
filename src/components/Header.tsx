@@ -10,9 +10,11 @@ interface HeaderProps {
   currentMode: "public" | "admin";
   setMode: (mode: "public" | "admin") => void;
   scrollToSection: (id: string) => void;
+  currency: "USD" | "INR";
+  setCurrency: (currency: "USD" | "INR") => void;
 }
 
-export default function Header({ currentMode, setMode, scrollToSection }: HeaderProps) {
+export default function Header({ currentMode, setMode, scrollToSection, currency, setCurrency }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Nav points for the public view
@@ -21,7 +23,6 @@ export default function Header({ currentMode, setMode, scrollToSection }: Header
     { label: "About", target: "about" },
     { label: "Pillars", target: "pillars" },
     { label: "Portfolio", target: "portfolio" },
-    { label: "Audit & Hacks", target: "audit" },
     { label: "Media Kit", target: "mediakit" },
     { label: "Newsletter", target: "newsletter" },
     { label: "FAQ & Contact", target: "contact" },
@@ -83,30 +84,45 @@ export default function Header({ currentMode, setMode, scrollToSection }: Header
 
         {/* Mode Switch & Primary Actions */}
         <div className="hidden lg:flex items-center space-x-4">
-          <button
-            onClick={() => {
-              setMode(currentMode === "public" ? "admin" : "public");
-              if (mobileMenuOpen) setMobileMenuOpen(false);
-            }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold tracking-wider transition-all duration-300 border ${
-              currentMode === "admin"
-                ? "bg-brand-dark text-white border-brand-dark hover:bg-brand-rose hover:border-brand-rose"
-                : "bg-brand-sand/70 text-brand-rose border-brand-blush/30 hover:bg-brand-blush/20"
-            }`}
-            id="mode-switch-desktop"
-          >
-            {currentMode === "admin" ? (
-              <>
-                <LogOut size={13} />
-                <span>Exit OS Dashboard</span>
-              </>
-            ) : (
-              <>
-                <LayoutDashboard size={13} />
-                <span>Creator OS Portal</span>
-              </>
-            )}
-          </button>
+          {/* Currency Toggle */}
+          <div className="flex bg-brand-sand/50 p-1 rounded-full border border-brand-blush/20 text-[10px] font-bold">
+            <button
+              onClick={() => setCurrency("USD")}
+              className={`px-3 py-1.5 rounded-full transition-all cursor-pointer font-sans tracking-wide uppercase ${
+                currency === "USD"
+                  ? "bg-brand-rose text-white shadow-sm"
+                  : "text-stone-600 hover:text-brand-rose"
+              }`}
+              title="Switch to USD prices"
+            >
+              USD ($)
+            </button>
+            <button
+              onClick={() => setCurrency("INR")}
+              className={`px-3 py-1.5 rounded-full transition-all cursor-pointer font-sans tracking-wide uppercase ${
+                currency === "INR"
+                  ? "bg-brand-rose text-white shadow-sm"
+                  : "text-stone-600 hover:text-brand-rose"
+              }`}
+              title="Switch to INR prices"
+            >
+              INR (₹)
+            </button>
+          </div>
+
+          {currentMode === "admin" && (
+            <button
+              onClick={() => {
+                setMode("public");
+                if (mobileMenuOpen) setMobileMenuOpen(false);
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold tracking-wider transition-all duration-300 border bg-brand-dark text-white border-brand-dark hover:bg-brand-rose hover:border-brand-rose"
+              id="mode-switch-desktop"
+            >
+              <LogOut size={13} />
+              <span>Exit OS Dashboard</span>
+            </button>
+          )}
 
           {currentMode === "public" ? (
             <button
@@ -133,16 +149,6 @@ export default function Header({ currentMode, setMode, scrollToSection }: Header
 
         {/* Mobile Nav Actions */}
         <div className="flex items-center gap-2 xl:hidden">
-          {/* Mode switch for mobile screens */}
-          <button
-            onClick={() => setMode(currentMode === "public" ? "admin" : "public")}
-            className="flex items-center justify-center p-2 rounded-full bg-brand-sand/60 text-brand-rose border border-brand-blush/20 hover:bg-brand-blush/20 transition-all"
-            title={currentMode === "admin" ? "Switch to Public Brand View" : "Open Creator OS Portal"}
-            id="mode-switch-mobile"
-          >
-            <LayoutDashboard size={16} />
-          </button>
-
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 text-brand-dark hover:text-brand-rose transition-colors cursor-pointer"
@@ -175,35 +181,51 @@ export default function Header({ currentMode, setMode, scrollToSection }: Header
           {currentMode === "admin" && (
             <div className="bg-brand-sand/40 p-3 rounded-xl border border-brand-blush/20 mb-2">
               <p className="font-mono text-[10px] text-brand-rose font-bold uppercase tracking-wider">
-                Operating System Active
+                Private Planning Desk Active
               </p>
               <p className="text-xs text-brand-dark/70 mt-1">
-                You are currently inside the private dashboard, viewing CRM pipelines, lead acquisitions, and analytics.
+                You are currently logged into your private creator desk, where you can reply to follower DMs, look at brand deal details, and adjust your profile numbers.
               </p>
             </div>
           )}
 
-          <div className="flex flex-col gap-2 pt-2">
-            <button
-              onClick={() => {
-                setMode(currentMode === "public" ? "admin" : "public");
-                setMobileMenuOpen(false);
-              }}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-semibold tracking-wider border border-brand-dark/20 text-brand-dark hover:bg-brand-sand transition-all"
-              id="mobile-drawer-mode-switch"
-            >
-              {currentMode === "admin" ? (
-                <>
-                  <LogOut size={14} />
-                  <span>Exit Dashboard Portal</span>
-                </>
-              ) : (
-                <>
-                  <LayoutDashboard size={14} />
-                  <span>Launch Creator OS Portal</span>
-                </>
-              )}
-            </button>
+          {/* Mobile Preferred Currency Selector */}
+          <div className="flex justify-between items-center px-3 py-2 bg-brand-sand/35 rounded-xl border border-brand-blush/10">
+            <span className="text-[10.5px] font-sans font-semibold text-stone-600">Region Pricing:</span>
+            <div className="flex bg-white p-0.5 rounded-full border border-brand-blush/20 text-[9px] font-bold">
+              <button
+                onClick={() => setCurrency("USD")}
+                className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                  currency === "USD" ? "bg-brand-rose text-white" : "text-stone-500"
+                }`}
+              >
+                USD ($)
+              </button>
+              <button
+                onClick={() => setCurrency("INR")}
+                className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                  currency === "INR" ? "bg-brand-rose text-white" : "text-stone-500"
+                }`}
+              >
+                INR (₹)
+              </button>
+            </div>
+          </div>
+
+           <div className="flex flex-col gap-2 pt-2">
+            {currentMode === "admin" && (
+              <button
+                onClick={() => {
+                  setMode("public");
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-semibold tracking-wider border border-brand-dark/20 text-brand-dark hover:bg-brand-sand transition-all"
+                id="mobile-drawer-mode-switch"
+              >
+                <LogOut size={14} />
+                <span>Exit Dashboard Portal</span>
+              </button>
+            )}
 
             {currentMode === "public" && (
               <button

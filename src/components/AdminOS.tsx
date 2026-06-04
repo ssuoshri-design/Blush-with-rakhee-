@@ -5,12 +5,11 @@
 
 import React, { useState } from "react";
 import { 
-  Users, DollarSign, LayoutDashboard, Radio, Mail, Eye, 
-  TrendingUp, Play, Plus, Trash2, Edit3, Bookmark, 
-  Download, RefreshCw, BarChart2, ShieldAlert, CheckCircle2, 
-  HelpCircle, Settings, FileText, ArrowUpRight, MessageSquare 
+  Users, DollarSign, Mail, Play, Plus, Trash2, 
+  Download, RefreshCw, CheckCircle2, MessageCircle, 
+  Send, Instagram, Facebook, Shield, Laptop, Star
 } from "lucide-react";
-import { CollabLead, InstagramReel, AffiliateItem, NewsletterSubscriber, CreatorStats } from "../types";
+import { CollabLead, InstagramReel, AffiliateItem, NewsletterSubscriber, CreatorStats, CreatorMessage } from "../types";
 
 interface AdminOSProps {
   stats: CreatorStats;
@@ -27,7 +26,13 @@ interface AdminOSProps {
   simulateClicks: () => void;
   subscribers: NewsletterSubscriber[];
   downloadCount: number;
+  messages: CreatorMessage[];
+  setMessages: React.Dispatch<React.SetStateAction<CreatorMessage[]>>;
+  currency: "USD" | "INR";
+  formatPrice: (usdAmount: number, digits?: number) => string;
 }
+
+type TabType = "brand-deals" | "follower-messages" | "video-posts" | "affiliate-links" | "newsletter-friends" | "profile-stats";
 
 export default function AdminOS({
   stats,
@@ -44,65 +49,80 @@ export default function AdminOS({
   simulateClicks,
   subscribers,
   downloadCount,
+  messages,
+  setMessages,
+  currency,
+  formatPrice,
 }: AdminOSProps) {
-  const [activeSubTab, setActiveSubTab] = useState<"dashboard" | "crm" | "content" | "affiliates" | "newsletter" | "analytics">("dashboard");
+  const [activeTab, setActiveTab] = useState<TabType>("brand-deals");
 
-  // Content CMS Edit State
+  // New Post Form Local State
   const [newReelTitle, setNewReelTitle] = useState("");
   const [newReelCategory, setNewReelCategory] = useState<InstagramReel["category"]>("Makeup Tutorial");
   const [newReelViews, setNewReelViews] = useState(5000);
   const [newReelEr, setNewReelEr] = useState(8.5);
-  const [newReelThumbnail, setNewReelThumbnail] = useState("https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=600");
 
-  // Stat numbers edit states
-  const [editFollowers, setEditFollowers] = useState(stats.followers);
-  const [editEngagement, setEditEngagement] = useState(stats.engagementAvg);
+  // Stats edit local state
+  const [followersInput, setFollowersInput] = useState(stats.followers);
+  const [engagementInput, setEngagementInput] = useState(stats.engagementAvg);
 
-  // CRM Search & Filters
-  const [crmSearch, setCrmSearch] = useState("");
-  const [crmStatusFilter, setCrmStatusFilter] = useState("All");
+  // Brand Deal log form local state
+  const [dealBrand, setDealBrand] = useState("");
+  const [dealContact, setDealContact] = useState("");
+  const [dealEmail, setDealEmail] = useState("");
+  const [dealBudget, setDealBudget] = useState(600);
+  const [dealType, setDealType] = useState("Dedicated Instagram Sponsored Reel");
+  const [dealNotes, setDealNotes] = useState("");
 
-  // Manual CRM creation
-  const [manualBrand, setManualBrand] = useState("");
-  const [manualPerson, setManualPerson] = useState("");
-  const [manualEmail, setManualEmail] = useState("");
-  const [manualBudget, setManualBudget] = useState(500);
-  const [manualType, setManualType] = useState("Sponsored Reel");
-  const [manualNotes, setManualNotes] = useState("");
+  // Search brand name
+  const [brandSearchQuery, setBrandSearchQuery] = useState("");
 
-  const handleManualLeadSubmit = (e: React.FormEvent) => {
+  // Messaging interactive state
+  const [replyInputId, setReplyInputId] = useState<string | null>(null);
+  const [replyTextValue, setReplyTextValue] = useState("");
+  const [automationKeyword, setAutomationKeyword] = useState("GLOW");
+  const [automationReplyText, setAutomationReplyText] = useState("Hey beautiful! Here is my conceal style cheat-sheet + my ShopMy link: shopmy.us/blushwithrakhee/concealer-glow");
+
+  // Form Submits
+  const handleLogBrandDeal = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!manualBrand || !manualPerson || !manualEmail) return;
+    if (!dealBrand || !dealContact || !dealEmail) return;
+
+    // Convert to USD base representation if submitted in INR
+    const finalBudget = currency === "INR" 
+      ? Math.round(Number(dealBudget) / 83) 
+      : Number(dealBudget);
 
     addLead({
-      id: "manual-" + Date.now(),
-      brandName: manualBrand,
-      contactPerson: manualPerson,
-      email: manualEmail,
-      budget: Number(manualBudget),
-      campaignType: manualType,
-      campaignDetails: manualNotes || "Manually logged lead internally inside the OS portal.",
+      id: "deal-" + Date.now(),
+      brandName: dealBrand,
+      contactPerson: dealContact,
+      email: dealEmail,
+      budget: finalBudget,
+      campaignType: dealType,
+      campaignDetails: dealNotes || "No extra requirements added.",
       status: "New Lead",
       date: new Date().toISOString().split("T")[0],
       paymentStatus: "Unpaid"
     });
 
-    setManualBrand("");
-    setManualPerson("");
-    setManualEmail("");
-    setManualNotes("");
+    setDealBrand("");
+    setDealContact("");
+    setDealEmail("");
+    setDealNotes("");
+    alert("New brand deal added to list successfully!");
   };
 
-  const handleStatSave = () => {
+  const handleUpdateViewsStats = () => {
     updateStats({
       ...stats,
-      followers: Number(editFollowers),
-      engagementAvg: Number(editEngagement)
+      followers: Number(followersInput),
+      engagementAvg: Number(engagementInput)
     });
-    alert("Creator stats update dispatced to homepage!");
+    alert("Profile numbers updated instantly on your main portfolio website!");
   };
 
-  const handleContentReelSubmit = (e: React.FormEvent) => {
+  const handlePublishReel = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newReelTitle) return;
 
@@ -113,828 +133,849 @@ export default function AdminOS({
       views: Number(newReelViews),
       likes: Math.round(newReelViews * 0.1),
       engagementRate: Number(newReelEr),
-      thumbnail: newReelThumbnail,
-      instagramUrl: "https://placeholder-instagram.com/reel/new",
+      thumbnail: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=600",
+      instagramUrl: "https://www.instagram.com/blushwithrakhee?igsh=MXBjMGFxZjN1cWR0OQ==",
       publishedDate: new Date().toISOString().split("T")[0]
     });
 
     setNewReelTitle("");
-    alert("New Reel added to Content CMS! Scroll down standard grids to view.");
+    alert("New Instagram Reel added! Go back to 'Beauty Content' on main page to preview.");
   };
 
-  const fileRefExport = () => {
-    // Simulated CSV export download
-    const formatCsv = "ID,Name,Email,Interests,DateJoined\n" + 
-      subscribers.map(s => `"${s.id}","${s.name}","${s.email}","${s.beautyInterests.join(";")}","${s.dateJoined}"`).join("\n");
-    const blob = new Blob([formatCsv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
+  const handleSendReplyToFollower = (id: string) => {
+    if (!replyTextValue.trim()) return;
+    setMessages(prev => prev.map(m => m.id === id ? { ...m, replied: true, replyText: replyTextValue } : m));
+    setReplyInputId(null);
+    setReplyTextValue("");
+    alert("Reply sent! An automated simulation of direct response is recorded.");
+  };
+
+  const handleToggleRepliedState = (id: string, curReplied: boolean) => {
+    setMessages(prev => prev.map(m => m.id === id ? { ...m, replied: !curReplied, replyText: !curReplied ? "Thank you sweetheart! Checking direct." : undefined } : m));
+  };
+
+  const handleCreateMockNewDM = () => {
+    const followerNames = ["Rita Sengupta", "Anamika K.", "Tanya Chopra", "Meera Malhotra"];
+    const followerHandles = ["@rita_s", "@makeupbyanamika", "@tanyachopra_90", "@meera_glows"];
+    const questions = [
+      "I commented GLOW, please send me the lipstick code!",
+      "Are these blushes safe for dry sensitive skin types?",
+      "Rakhee, which brush did you use to blend the concealer crease?",
+      "Need your direct email address for my boutique skin brand"
+    ];
+    const randomIndex = Math.floor(Math.random() * followerNames.length);
+
+    const newDM: CreatorMessage = {
+      id: "msg-" + Date.now(),
+      senderName: followerNames[randomIndex],
+      senderHandle: followerHandles[randomIndex],
+      messageText: questions[randomIndex],
+      platform: "Instagram DM",
+      date: new Date().toISOString().split("T")[0],
+      replied: false
+    };
+
+    setMessages([newDM, ...messages]);
+  };
+
+  const handleExportSubscribers = () => {
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + ["Name,Email,Join Date,Interests"].join(",") + "\n"
+      + subscribers.map(s => `"${s.name}","${s.email}","${s.dateJoined}","${s.beautyInterests.join("; ")}"`).join("\n");
+    const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
-    link.href = url;
-    link.download = `blush_with_rakhee_subscribers_${new Date().toISOString().split("T")[0]}.csv`;
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `subscribers_list_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
   };
 
-  // Math KPI Calculations
-  const pipelineTotal = leads.reduce((sum, l) => sum + (l.status !== "Rejected" ? l.budget : 0), 0);
-  const completedDealsTotal = leads.reduce((sum, l) => sum + (l.status === "Completed" ? l.budget : 0), 0);
-  const affiliateRevenueTotal = affiliates.reduce((sum, a) => sum + a.revenueGenerated, 0);
-  const totalLeadsCount = leads.length;
+  // Math totals for the desk display
+  const totalBrandEarnings = leads
+    .filter(l => l.status === "Approved" || l.status === "Completed")
+    .reduce((sum, l) => sum + l.budget, 0);
+
+  const pendingIncomingDeals = leads
+    .filter(l => l.status === "New Lead" || l.status === "Negotiation")
+    .reduce((sum, l) => sum + l.budget, 0);
+
+  const activeNewsletterCount = subscribers.length;
+  const totalAffClicks = affiliates.reduce((sum, a) => sum + a.clicks, 0);
+  const totalAffEarnings = affiliates.reduce((sum, a) => sum + a.revenueGenerated, 0);
 
   return (
-    <section id="admin-os-portal" className="py-16 bg-stone-50 border-t border-brand-blush/25 relative scroll-mt-20">
+    <section id="admin-work-desk" className="py-10 bg-[#FAF8F5] border-t border-brand-blush/25 relative scroll-mt-20">
       
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         
-        {/* Portal Header */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-b border-brand-blush/20 pb-8 mb-10 text-left">
+        {/* Simplified Branding Header */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-brand-blush/15 pb-6 mb-8 text-left">
           <div>
-            <div className="inline-flex items-center gap-1.5 bg-brand-dark/95 text-white border border-[#B76E79] px-3 py-1 rounded-full mb-3 shadow-sm animate-pulse">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span className="font-mono text-[9px] uppercase tracking-wider font-bold">Authenticated Admin Portal</span>
+            <div className="inline-flex items-center gap-2 bg-brand-rose text-white text-[10px] uppercase font-bold px-3 py-1 rounded-full mb-2">
+              <Shield size={11} />
+              <span>Rakhee's Private Desk</span>
             </div>
-            
-            <h2 className="font-serif text-3xl font-bold text-brand-dark leading-tight">
-              Creator Operating System <span className="text-brand-rose italic font-light">Suite</span>
+            <h2 className="font-serif text-2xl font-bold text-brand-dark">
+              My Creator Notebook &amp; Helpers
             </h2>
-            <p className="font-sans text-xs text-stone-500 mt-1 max-w-xl">
-              Unrestricted access to CRM lead statuses, affiliate click trackers, real-time analytics dashboards, and CMS home layouts.
+            <p className="font-sans text-xs text-stone-500 mt-0.5">
+              Welcome back, Rakhee! Use this simplified desk to change your portfolio stats, answer follower questions, draft brand deals, and view your newsletter list. No complex codes here.
             </p>
           </div>
 
           <div className="flex flex-wrap gap-2">
             <button
               onClick={simulateClicks}
-              className="inline-flex items-center gap-1.5 bg-brand-rose/20 text-brand-rose border border-brand-blush hover:bg-brand-rose hover:text-white px-4 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 bg-brand-sand hover:bg-brand-rose hover:text-white text-brand-rose border border-brand-rose/25 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+              title="Add simulated traffic views and sales clicks to your affiliate metrics"
             >
-              <RefreshCw size={13} className="animate-spin-slow" />
-              <span>Simulate Traffic Click</span>
+              <RefreshCw size={13} />
+              <span>Simulate Reader Link Click</span>
             </button>
+
             <button
-              onClick={fileRefExport}
-              className="inline-flex items-center gap-1.5 bg-brand-dark text-white hover:bg-brand-rose px-4 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer"
+              onClick={handleCreateMockNewDM}
+              className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer"
             >
-              <Download size={13} />
-              <span>Export Subscribers CSV</span>
+              <MessageCircle size={13} />
+              <span>Receive New Mock DM</span>
             </button>
           </div>
         </div>
 
-        {/* Horizontal Navigation Control tabs */}
-        <div className="flex flex-wrap gap-1 bg-white p-1 rounded-2xl border border-brand-blush/25 shadow-sm mb-8" id="os-tab-nav">
+        {/* Dynamic Plain-Text Notebook Tabs */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 bg-brand-sand/35 p-1.5 rounded-2xl border border-brand-blush/20 shadow-sm mb-6" id="desk-navigation-bar">
           <button
-            onClick={() => setActiveSubTab("dashboard")}
-            className={`flex-1 min-w-[120px] font-sans text-xs font-bold uppercase tracking-wider py-3.5 px-4 rounded-xl transition-all cursor-pointer ${
-              activeSubTab === "dashboard" ? "bg-brand-rose text-white shadow-sm" : "text-stone-600 hover:bg-brand-sand/30"
+            onClick={() => setActiveTab("brand-deals")}
+            className={`w-full font-sans text-[11px] sm:text-xs font-bold py-2.5 px-2 rounded-xl transition-all cursor-pointer text-center truncate ${
+              activeTab === "brand-deals" 
+                ? "bg-brand-rose text-white shadow-xs" 
+                : "bg-white text-stone-600 hover:bg-stone-50 border border-brand-blush/5"
             }`}
           >
-            Dashboard
+            🤝 Brand Deals ({leads.length})
           </button>
           <button
-            onClick={() => setActiveSubTab("crm")}
-            className={`flex-1 min-w-[120px] font-sans text-xs font-bold uppercase tracking-wider py-3.5 px-4 rounded-xl transition-all cursor-pointer ${
-              activeSubTab === "crm" ? "bg-brand-rose text-white shadow-sm" : "text-stone-600 hover:bg-brand-sand/30"
+            onClick={() => setActiveTab("follower-messages")}
+            className={`w-full font-sans text-[11px] sm:text-xs font-bold py-2.5 px-2 rounded-xl transition-all cursor-pointer text-center truncate ${
+              activeTab === "follower-messages" 
+                ? "bg-brand-rose text-white shadow-xs" 
+                : "bg-white text-stone-600 hover:bg-stone-50 border border-brand-blush/5"
             }`}
           >
-            CRM Leads
+            💬 Messages ({messages.filter(m => !m.replied).length})
           </button>
           <button
-            onClick={() => setActiveSubTab("content")}
-            className={`flex-1 min-w-[120px] font-sans text-xs font-bold uppercase tracking-wider py-3.5 px-4 rounded-xl transition-all cursor-pointer ${
-              activeSubTab === "content" ? "bg-brand-rose text-white shadow-sm" : "text-stone-600 hover:bg-brand-sand/30"
+            onClick={() => setActiveTab("video-posts")}
+            className={`w-full font-sans text-[11px] sm:text-xs font-bold py-2.5 px-2 rounded-xl transition-all cursor-pointer text-center truncate ${
+              activeTab === "video-posts" 
+                ? "bg-brand-rose text-white shadow-xs" 
+                : "bg-white text-stone-600 hover:bg-stone-50 border border-brand-blush/5"
             }`}
           >
-            Content CMS
+            📹 Videos ({reels.length})
           </button>
           <button
-            onClick={() => setActiveSubTab("affiliates")}
-            className={`flex-1 min-w-[120px] font-sans text-xs font-bold uppercase tracking-wider py-3.5 px-4 rounded-xl transition-all cursor-pointer ${
-              activeSubTab === "affiliates" ? "bg-brand-rose text-white shadow-sm" : "text-stone-600 hover:bg-brand-sand/30"
+            onClick={() => setActiveTab("affiliate-links")}
+            className={`w-full font-sans text-[11px] sm:text-xs font-bold py-2.5 px-2 rounded-xl transition-all cursor-pointer text-center truncate ${
+              activeTab === "affiliate-links" 
+                ? "bg-brand-rose text-white shadow-xs" 
+                : "bg-white text-stone-600 hover:bg-stone-50 border border-brand-blush/5"
             }`}
           >
-            Affiliates
+            🌟 Earnings
           </button>
           <button
-            onClick={() => setActiveSubTab("newsletter")}
-            className={`flex-1 min-w-[120px] font-sans text-xs font-bold uppercase tracking-wider py-3.5 px-4 rounded-xl transition-all cursor-pointer ${
-              activeSubTab === "newsletter" ? "bg-brand-rose text-white shadow-sm" : "text-stone-600 hover:bg-brand-sand/30"
+            onClick={() => setActiveTab("newsletter-friends")}
+            className={`w-full font-sans text-[11px] sm:text-xs font-bold py-2.5 px-2 rounded-xl transition-all cursor-pointer text-center truncate ${
+              activeTab === "newsletter-friends" 
+                ? "bg-brand-rose text-white shadow-xs" 
+                : "bg-white text-stone-600 hover:bg-stone-50 border border-brand-blush/5"
             }`}
           >
-            Newsletter
+            💖 Friends ({activeNewsletterCount})
           </button>
           <button
-            onClick={() => setActiveSubTab("analytics")}
-            className={`flex-1 min-w-[120px] font-sans text-xs font-bold uppercase tracking-wider py-3.5 px-4 rounded-xl transition-all cursor-pointer ${
-              activeSubTab === "analytics" ? "bg-brand-rose text-white shadow-sm" : "text-stone-600 hover:bg-brand-sand/30"
+            onClick={() => setActiveTab("profile-stats")}
+            className={`w-full font-sans text-[11px] sm:text-xs font-bold py-2.5 px-2 rounded-xl transition-all cursor-pointer text-center truncate ${
+              activeTab === "profile-stats" 
+                ? "bg-brand-rose text-white shadow-xs" 
+                : "bg-white text-stone-600 hover:bg-stone-50 border border-brand-blush/5"
             }`}
           >
-            Traffic Analytics
+            ⚙️ Stats Setup
           </button>
         </div>
 
-        {/* ================= VIEW: DASHBOARD PANEL METRICS ================= */}
-        {activeSubTab === "dashboard" && (
-          <div className="space-y-8 animate-fadeIn text-left">
-            {/* KPI Cards row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="os-dashboard-kpis">
-              <div className="bg-white p-5 rounded-2xl border border-brand-blush/20 shadow-sm">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-stone-500 text-[10px] font-bold uppercase tracking-wider">Revenue Pipeline</span>
-                  <div className="w-8 h-8 rounded-full bg-brand-sand flex items-center justify-center text-brand-rose"><DollarSign size={14} /></div>
-                </div>
-                <p className="font-mono text-xl sm:text-2xl font-bold text-brand-dark">${pipelineTotal.toLocaleString()}</p>
-                <div className="text-[10px] text-stone-400 mt-1">Actively Negotiated &amp; Approved</div>
-              </div>
-
-              <div className="bg-white p-5 rounded-2xl border border-brand-blush/20 shadow-sm">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-stone-500 text-[10px] font-bold uppercase tracking-wider">Laid CRM Leads</span>
-                  <div className="w-8 h-8 rounded-full bg-brand-sand flex items-center justify-center text-brand-rose"><Users size={14} /></div>
-                </div>
-                <p className="font-mono text-xl sm:text-2xl font-bold text-brand-dark">{totalLeadsCount}</p>
-                <div className="text-[10px] text-stone-400 mt-1">{leads.filter(l => l.status === "New Lead").length} Unread / New Requests</div>
-              </div>
-
-              <div className="bg-white p-5 rounded-2xl border border-brand-blush/20 shadow-sm">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-stone-500 text-[10px] font-bold uppercase tracking-wider">Affiliate Earnings</span>
-                  <div className="w-8 h-8 rounded-full bg-brand-sand flex items-center justify-center text-brand-rose"><Radio size={14} /></div>
-                </div>
-                <p className="font-mono text-xl sm:text-2xl font-bold text-green-600">${affiliateRevenueTotal.toFixed(2)}</p>
-                <div className="text-[10px] text-stone-400 mt-1">Commission payouts unlocked</div>
-              </div>
-
-              <div className="bg-white p-5 rounded-2xl border border-brand-blush/20 shadow-sm">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-stone-500 text-[10px] font-bold uppercase tracking-wider">Digital Outreach</span>
-                  <div className="w-8 h-8 rounded-full bg-brand-sand flex items-center justify-center text-brand-rose"><Mail size={14} /></div>
-                </div>
-                <p className="font-mono text-xl sm:text-2xl font-bold text-brand-dark">{subscribers.length}</p>
-                <div className="text-[10px] text-stone-400 mt-1">{downloadCount} Media kit packets shared</div>
-              </div>
-            </div>
-
-            {/* Content Spotlight Split */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6" id="os-dashboard-split">
-              
-              {/* Recent brand acquisitions pipeline (Left lg:col-span-8) */}
-              <div className="lg:col-span-8 bg-white p-6 rounded-3xl border border-brand-blush/20 shadow-sm flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-center border-b border-stone-100 pb-4 mb-4">
-                    <h3 className="font-serif text-lg font-bold">Recent Campaign Acquisitions</h3>
-                    <button onClick={() => setActiveSubTab("crm")} className="text-xs text-brand-rose hover:underline font-bold font-mono uppercase">View CRM Pipeline &rarr;</button>
-                  </div>
-
-                  <div className="space-y-3">
-                    {leads.slice(0, 3).map((lead) => (
-                      <div key={lead.id} className="p-3.5 rounded-xl bg-brand-sand/20 border border-brand-blush/10 flex items-center justify-between gap-4">
-                        <div className="text-left">
-                          <p className="font-serif text-sm font-bold">{lead.brandName}</p>
-                          <p className="text-[10px] text-stone-500 font-sans mt-0.5">Contact: {lead.contactPerson} • {lead.campaignType}</p>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-bold text-brand-dark">${lead.budget}</span>
-                          <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase ${
-                            lead.status === "Approved" ? "bg-emerald-50 text-emerald-700" :
-                            lead.status === "Negotiation" ? "bg-amber-50 text-amber-700" : "bg-blue-50 text-blue-700"
-                          }`}>
-                            {lead.status}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-stone-100 bg-brand-sand/30 p-4 rounded-2xl flex items-center justify-between text-xs font-sans">
-                  <span>Authorized Secure Session: ID blush_ops_2026</span>
-                  <span className="text-brand-rose font-bold">● SYSTEM ONLINE</span>
-                </div>
-              </div>
-
-              {/* Direct Metrics Quick settings (Right lg:col-span-4) */}
-              <div className="lg:col-span-4 bg-white p-6 rounded-3xl border border-brand-blush/20 shadow-sm text-left">
-                <h3 className="font-serif text-lg font-bold border-b border-stone-100 pb-4 mb-4">Ecosystem Overview</h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-[10px] font-mono tracking-wider uppercase text-stone-500 mb-1 font-bold">Update Followers on Homepage</label>
-                    <div className="flex gap-1.5">
-                      <input 
-                        type="number"
-                        value={editFollowers}
-                        onChange={(e) => setEditFollowers(Number(e.target.value))}
-                        className="bg-stone-50 border border-brand-blush/20 text-xs px-2.5 py-1.5 rounded-lg w-full focus:outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] font-mono tracking-wider uppercase text-stone-500 mb-1 font-bold">Update Engagement Rate (%)</label>
-                    <div className="flex gap-1.5">
-                      <input 
-                        type="number"
-                        step="0.1"
-                        value={editEngagement}
-                        onChange={(e) => setEditEngagement(Number(e.target.value))}
-                        className="bg-stone-50 border border-brand-blush/20 text-xs px-2.5 py-1.5 rounded-lg w-full focus:outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={handleStatSave}
-                    className="w-full bg-brand-dark hover:bg-brand-rose text-white py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors"
-                  >
-                    Deploy Updates
-                  </button>
-                </div>
-              </div>
-
-            </div>
-
+        {/* Simple count cards for Quick At-A-Glance views */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 mb-8">
+          <div className="bg-white p-4 rounded-2xl border border-brand-blush/10 text-left">
+            <p className="text-[10px] uppercase text-stone-400 font-bold font-mono tracking-wider">Earned Brand Income</p>
+            <p className="text-xl font-bold text-brand-dark mt-1">{formatPrice(totalBrandEarnings)}</p>
           </div>
-        )}
+          <div className="bg-white p-4 rounded-2xl border border-brand-blush/10 text-left">
+            <p className="text-[10px] uppercase text-stone-400 font-bold font-mono tracking-wider">Potential Brand Inquiries</p>
+            <p className="text-xl font-bold text-stone-500 mt-1">{formatPrice(pendingIncomingDeals)}</p>
+          </div>
+          <div className="bg-white p-4 rounded-2xl border border-brand-blush/10 text-left">
+            <p className="text-[10px] uppercase text-stone-400 font-bold font-mono tracking-wider">Affiliate Sales Cash</p>
+            <p className="text-xl font-bold text-[#4F7942] mt-1">{formatPrice(totalAffEarnings, 2)}</p>
+          </div>
+          <div className="bg-white p-4 rounded-2xl border border-brand-blush/10 text-left">
+            <p className="text-[10px] uppercase text-stone-400 font-bold font-mono tracking-wider">Commission Link Clicks</p>
+            <p className="text-xl font-bold text-brand-rose mt-1">{totalAffClicks} visits</p>
+          </div>
+        </div>
 
-        {/* ================= VIEW: CRM PIPELINE SYSTEM ================= */}
-        {activeSubTab === "crm" && (
-          <div className="space-y-6 animate-fadeIn text-left" id="os-crm-portal">
+        {/* ================= TAB 1: BRAND DEALS (CRM) ================= */}
+        {activeTab === "brand-deals" && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 text-left animate-fadeIn">
             
-            {/* Split row: Leads list table vs Manual entry */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              
-              {/* Leads table column */}
-              <div className="lg:col-span-8 bg-white p-5 rounded-3xl border border-brand-blush/20 shadow-sm">
-                
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-stone-100 pb-4 mb-4">
-                  <h3 className="font-serif text-lg font-bold">CRM Pipeline Campaigns</h3>
-                  
-                  {/* Local CRM filtering */}
-                  <div className="flex items-center gap-1.5">
+            {/* Left Column: Brand deal list table */}
+            <div className="lg:col-span-8 bg-white p-5 rounded-3xl border border-brand-blush/10 shadow-sm">
+              <div className="flex justify-between items-center pb-4 mb-4 border-b border-stone-100">
+                <h3 className="font-serif text-base font-bold text-brand-dark">Active Projects &amp; Negotiations</h3>
+                <input 
+                  type="text" 
+                  placeholder="Type Brand name filter..." 
+                  value={brandSearchQuery}
+                  onChange={(e) => setBrandSearchQuery(e.target.value)}
+                  className="bg-stone-50 border border-brand-blush/20 text-xs px-2.5 py-1.5 rounded-xl focus:outline-none w-44"
+                />
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs font-sans text-stone-600">
+                  <thead>
+                    <tr className="border-b border-stone-100 text-[10px] uppercase font-bold text-stone-400">
+                      <th className="pb-3 text-left">Brand Partners</th>
+                      <th className="pb-3 text-right">Offer Budget</th>
+                      <th className="pb-3 text-left pl-4">Deal Status</th>
+                      <th className="pb-3 text-left">Client Paid</th>
+                      <th className="pb-3 text-right">Remove</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-50">
+                    {leads
+                      .filter(l => l.brandName.toLowerCase().includes(brandSearchQuery.toLowerCase()))
+                      .map((lead) => (
+                        <tr key={lead.id} className="hover:bg-stone-50">
+                          <td className="py-3">
+                            <p className="font-bold text-brand-dark text-sm">{lead.brandName}</p>
+                            <p className="text-[10px] text-stone-500 mt-0.5">Contact: {lead.contactPerson} ({lead.email})</p>
+                            <p className="text-[10px] text-brand-rose italic mt-1 bg-brand-sand/30 underline inline-block px-1.5 rounded">Format: {lead.campaignType}</p>
+                            {lead.campaignDetails && (
+                              <p className="text-[10.5px] text-stone-400 mt-1 pl-2 border-l border-brand-rose line-clamp-1" title={lead.campaignDetails}>
+                                "{lead.campaignDetails}"
+                              </p>
+                            )}
+                          </td>
+                          <td className="py-3 text-right font-mono font-bold text-stone-800">{formatPrice(lead.budget)}</td>
+                          <td className="py-3 pl-4">
+                            <select
+                              value={lead.status}
+                              onChange={(e) => updateLeadStatus(lead.id, e.target.value as CollabLead["status"])}
+                              className="bg-stone-50 border border-stone-200 text-[10px] px-2 py-1 rounded text-stone-700 font-semibold focus:outline-none cursor-pointer"
+                            >
+                              <option value="New Lead">1. New Deal Request</option>
+                              <option value="Contacted">2. Contacted Partner</option>
+                              <option value="Negotiation">3. In Price Negotiation</option>
+                              <option value="Approved">4. Approved &amp; Booked</option>
+                              <option value="Completed">5. Video Post Done &amp; Finished</option>
+                              <option value="Rejected">Pass / Rejected</option>
+                            </select>
+                          </td>
+                          <td className="py-3">
+                            <select
+                              value={lead.paymentStatus || "Unpaid"}
+                              onChange={(e) => updateLeadPayment(lead.id, e.target.value as CollabLead["paymentStatus"])}
+                              className={`text-[9.5px] px-2 py-0.5 font-bold rounded uppercase ${
+                                lead.paymentStatus === "Paid" ? "bg-emerald-50 text-emerald-700" :
+                                lead.paymentStatus === "Partial" ? "bg-amber-50 text-amber-700" : "bg-rose-50 text-rose-600 font-normal"
+                              }`}
+                            >
+                              <option value="Unpaid">❌ Not Paid Yet</option>
+                              <option value="Partial">⏳ Partially Paid</option>
+                              <option value="Paid">✅ Fully Paid!</option>
+                            </select>
+                          </td>
+                          <td className="py-3 text-right">
+                            <button
+                              onClick={() => {
+                                if(confirm(`Remove ${lead.brandName} from deals notebook?`)) deleteLead(lead.id);
+                              }}
+                              className="text-stone-300 hover:text-red-500 transition-colors p-1"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    {leads.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="py-6 text-center text-stone-400">No brand deal entries yet. Log one on the right!</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Right Column: Simple Deal Logging Form */}
+            <div className="lg:col-span-4 bg-white p-5 rounded-3xl border border-brand-blush/10 shadow-sm">
+              <h3 className="font-serif text-base font-bold text-brand-dark mb-4 pb-2 border-b border-stone-100">
+                Log a Brand Deal
+              </h3>
+              <form onSubmit={handleLogBrandDeal} className="space-y-4 text-xs font-sans">
+                <div>
+                  <label className="block text-stone-500 font-semibold mb-1">Brand / Company Name</label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="e.g. Fenty Beauty" 
+                    value={dealBrand}
+                    onChange={(e) => setDealBrand(e.target.value)}
+                    className="w-full bg-[#FAF8F5] border border-brand-blush/20 rounded-xl px-3 py-2 text-xs focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-stone-500 font-semibold mb-1">Contact Person Name</label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="e.g. Elena Ramos" 
+                    value={dealContact}
+                    onChange={(e) => setDealContact(e.target.value)}
+                    className="w-full bg-[#FAF8F5] border border-brand-blush/20 rounded-xl px-3 py-2 text-xs focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-stone-500 font-semibold mb-1">Their Email</label>
+                  <input 
+                    type="email" 
+                    required
+                    placeholder="e.g. partnerships@fenty.com" 
+                    value={dealEmail}
+                    onChange={(e) => setDealEmail(e.target.value)}
+                    className="w-full bg-[#FAF8F5] border border-brand-blush/20 rounded-xl px-3 py-2 text-xs focus:outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-stone-400 font-semibold mb-1">Price Deal ({currency === "INR" ? "INR ₹" : "USD $" })</label>
                     <input 
-                      type="text" 
-                      placeholder="Search base brand..." 
-                      value={crmSearch}
-                      onChange={(e) => setCrmSearch(e.target.value)}
-                      className="bg-stone-50 border border-brand-blush/20 px-2.5 py-1.5 text-xs rounded-xl focus:outline-none w-36"
+                      type="number" 
+                      required
+                      value={dealBudget}
+                      onChange={(e) => setDealBudget(Number(e.target.value))}
+                      className="w-full bg-[#FAF8F5] border border-brand-blush/20 rounded-xl px-3 py-2 text-xs focus:outline-none"
                     />
+                  </div>
+                  <div>
+                    <label className="block text-stone-500 font-semibold mb-1">Format</label>
                     <select
-                      value={crmStatusFilter}
-                      onChange={(e) => setCrmStatusFilter(e.target.value)}
-                      className="bg-stone-50 border border-brand-blush/20 px-2.5 py-1.5 text-xs rounded-xl focus:outline-none"
+                      value={dealType}
+                      onChange={(e) => setDealType(e.target.value)}
+                      className="w-full bg-[#FAF8F5] border border-brand-blush/20 rounded-xl px-2 py-2 text-xs focus:outline-none text-stone-700"
                     >
-                      <option value="All">All Stages</option>
-                      <option value="New Lead">New Lead</option>
-                      <option value="Negotiation">Negotiation</option>
-                      <option value="Approved">Approved</option>
-                      <option value="Completed">Completed</option>
+                      <option value="Dedicated Instagram Sponsored Reel">Instagram Reel</option>
+                      <option value="UGC Video Product Wear-Test (Raw)">UGC Raw Video</option>
+                      <option value="1x Reel + 2x IG Story Injections">Reel + Stories</option>
+                      <option value="Long-Term Brand Ambassadorship">Ambassador Deal</option>
                     </select>
                   </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs text-stone-700 font-sans">
-                    <thead>
-                      <tr className="border-b border-stone-100 uppercase text-[9px] text-stone-400 font-bold font-mono">
-                        <th className="pb-3">Brand Name</th>
-                        <th className="pb-3 text-right">Budget</th>
-                        <th className="pb-3">Workflow Status</th>
-                        <th className="pb-3">Bill Payment</th>
-                        <th className="pb-3 text-right text-stone-300">Operations</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-stone-50">
-                      {leads
-                        .filter(l => crmStatusFilter === "All" || l.status === crmStatusFilter)
-                        .filter(l => l.brandName.toLowerCase().includes(crmSearch.toLowerCase()))
-                        .map((lead) => (
-                          <tr key={lead.id} className="hover:bg-brand-sand/15 transition-colors">
-                            <td className="py-3">
-                              <p className="font-serif text-sm font-bold text-brand-dark">{lead.brandName}</p>
-                              <p className="text-[10px] text-stone-500 mt-0.5">{lead.contactPerson} • {lead.email}</p>
-                              <p className="text-[9px] text-brand-rose font-mono">Date Logged: {lead.date}</p>
-                            </td>
-                            <td className="py-3 text-right font-mono font-bold text-brand-dark">${lead.budget}</td>
-                            <td className="py-3">
-                              {/* Inline status updating dropdown */}
-                              <select
-                                value={lead.status}
-                                onChange={(e) => updateLeadStatus(lead.id, e.target.value as CollabLead["status"])}
-                                className={`text-[9px] px-2 py-1 font-bold rounded-full uppercase focus:outline-none ${
-                                  lead.status === "Approved" ? "bg-emerald-50 text-emerald-700" :
-                                  lead.status === "Negotiation" ? "bg-amber-50 text-amber-700 animate-pulse" :
-                                  lead.status === "Completed" ? "bg-zinc-100 text-stone-600" : "bg-blue-50 text-blue-700"
-                                }`}
-                              >
-                                <option value="New Lead">New Lead</option>
-                                <option value="Contacted">Contacted</option>
-                                <option value="Negotiation">Negotiation</option>
-                                <option value="Approved">Approved</option>
-                                <option value="Rejected">Rejected</option>
-                                <option value="Completed">Completed</option>
-                              </select>
-                            </td>
-                            <td className="py-3">
-                              {/* Dynamic payment tracking dropdown */}
-                              <select
-                                value={lead.paymentStatus || "Unpaid"}
-                                onChange={(e) => updateLeadPayment(lead.id, e.target.value as CollabLead["paymentStatus"])}
-                                className={`text-[9.5px] px-2.5 py-0.5 font-bold rounded uppercase ${
-                                  lead.paymentStatus === "Paid" ? "bg-green-100 text-green-800" :
-                                  lead.paymentStatus === "Partial" ? "bg-amber-100 text-amber-800" : "bg-red-50 text-red-500"
-                                }`}
-                              >
-                                <option value="Unpaid">Unpaid</option>
-                                <option value="Partial">Partial</option>
-                                <option value="Paid">Paid</option>
-                              </select>
-                            </td>
-                            <td className="py-3 text-right">
-                              <button
-                                onClick={() => deleteLead(lead.id)}
-                                className="text-red-500 hover:text-red-700 p-1 cursor-pointer inline-block"
-                                title="Delete lead audit record"
-                              >
-                                <Trash2 size={13} />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  </table>
+                <div>
+                  <label className="block text-stone-500 font-semibold mb-1">General Deal Notes (Shipment, ideas...)</label>
+                  <textarea 
+                    rows={2}
+                    placeholder="e.g. Sending peach blush shade. Scheduled to film on physical delivery next Thursday." 
+                    value={dealNotes}
+                    onChange={(e) => setDealNotes(e.target.value)}
+                    className="w-full bg-[#FAF8F5] border border-brand-blush/20 rounded-xl px-3 py-2 text-xs focus:outline-none"
+                  />
                 </div>
 
-              </div>
-
-              {/* Manual leads entry box Column */}
-              <div className="lg:col-span-4 bg-white p-5 rounded-3xl border border-brand-blush/20 shadow-sm">
-                <h3 className="font-serif text-md font-bold border-b border-stone-100 pb-3.5 mb-4">Log Direct Campaign Lead</h3>
-                
-                <form onSubmit={handleManualLeadSubmit} className="space-y-3 font-sans">
-                  <div>
-                    <label className="block text-[9px] font-mono uppercase text-stone-500 mb-1 font-bold">Brand Name</label>
-                    <input 
-                      type="text" 
-                      required
-                      placeholder="e.g. Rare Beauty Co." 
-                      value={manualBrand}
-                      onChange={(e) => setManualBrand(e.target.value)}
-                      className="bg-stone-50 border border-brand-blush/20 text-xs px-2.5 py-1.5 rounded-lg w-full focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[9px] font-mono uppercase text-stone-500 mb-1 font-bold">Contact Person</label>
-                    <input 
-                      type="text" 
-                      required
-                      placeholder="e.g. Selena Gomez" 
-                      value={manualPerson}
-                      onChange={(e) => setManualPerson(e.target.value)}
-                      className="bg-stone-50 border border-brand-blush/20 text-xs px-2.5 py-1.5 rounded-lg w-full focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[9px] font-mono uppercase text-stone-500 mb-1 font-bold">Representative Email</label>
-                    <input 
-                      type="email" 
-                      required
-                      placeholder="gomez@rarebeauty.com" 
-                      value={manualEmail}
-                      onChange={(e) => setManualEmail(e.target.value)}
-                      className="bg-stone-50 border border-brand-blush/20 text-xs px-2.5 py-1.5 rounded-lg w-full focus:outline-none"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-[9px] font-mono uppercase text-stone-500 mb-1 font-bold">Rate Budget</label>
-                      <input 
-                        type="number" 
-                        required
-                        value={manualBudget}
-                        onChange={(e) => setManualBudget(Number(e.target.value))}
-                        className="bg-stone-50 border border-brand-blush/20 text-xs px-2.5 py-1.5 rounded-lg w-full focus:outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[9px] font-mono uppercase text-stone-500 mb-1 font-bold">Format Type</label>
-                      <select 
-                        value={manualType}
-                        onChange={(e) => setManualType(e.target.value)}
-                        className="bg-stone-50 border border-brand-blush/20 text-xs px-2.5 py-1.5 rounded-lg w-full focus:outline-none text-stone-700"
-                      >
-                        <option value="Sponsored Reel">Sponsored Reel</option>
-                        <option value="UGC Video Raw">UGC Video Raw</option>
-                        <option value="Story Series">Story Series</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-[9px] font-mono uppercase text-stone-500 mb-1 font-bold">Log Campaign Notes</label>
-                    <textarea 
-                      rows={2}
-                      placeholder="Products received. Scheduled for publication." 
-                      value={manualNotes}
-                      onChange={(e) => setManualNotes(e.target.value)}
-                      className="bg-stone-50 border border-brand-blush/20 text-xs px-2.5 py-1.5 rounded-lg w-full focus:outline-none"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full bg-brand-rose hover:bg-brand-dark text-white py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors mt-2"
-                  >
-                    Create Lead Entry
-                  </button>
-                </form>
-              </div>
-
+                <button
+                  type="submit"
+                  className="w-full bg-brand-rose hover:bg-brand-dark text-white font-bold py-2.5 rounded-xl transition-all cursor-pointer text-xs"
+                >
+                  Save Deal to Notebook
+                </button>
+              </form>
             </div>
-
           </div>
         )}
 
-        {/* ================= VIEW: CONTENT CMS LAYOUTS ================= */}
-        {activeSubTab === "content" && (
-          <div className="space-y-6 animate-fadeIn text-left" id="os-cms-portal">
+        {/* ================= TAB 2: FOLLOWER MESSAGES & COMMENTS ================= */}
+        {activeTab === "follower-messages" && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 text-left animate-fadeIn">
             
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              
-              {/* Add New Reels CMS block (Left lg:col-span-5) */}
-              <div className="lg:col-span-5 bg-white p-5 rounded-3xl border border-brand-blush/20 shadow-sm">
-                <h3 className="font-serif text-md font-bold border-b border-stone-100 pb-3.5 mb-4">Upload New Reels Metadata</h3>
-                
-                <form onSubmit={handleContentReelSubmit} className="space-y-4 font-sans text-xs">
-                  <div>
-                    <label className="block text-[9px] font-mono uppercase text-stone-500 mb-1 font-bold">Reel Title</label>
-                    <input 
-                      type="text" 
-                      required
-                      placeholder="e.g. Laneige Tint Double Wear Swatch test" 
-                      value={newReelTitle}
-                      onChange={(e) => setNewReelTitle(e.target.value)}
-                      className="bg-stone-50 border border-brand-blush/20 text-xs px-2.5 py-1.5 rounded-lg w-full focus:outline-none"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3.5">
-                    <div>
-                      <label className="block text-[9px] font-mono uppercase text-stone-500 mb-1 font-bold">Beauty Category</label>
-                      <select 
-                        value={newReelCategory}
-                        onChange={(e) => setNewReelCategory(e.target.value as InstagramReel["category"])}
-                        className="bg-stone-50 border border-brand-blush/20 text-[11px] px-2 py-1.5 rounded-lg w-full text-stone-700 font-medium focus:outline-none"
-                      >
-                        <option value="Skincare">Skincare</option>
-                        <option value="Makeup Tutorial">Makeup Tutorial</option>
-                        <option value="Beauty Hack">Beauty Hack</option>
-                        <option value="GRWM">GRWM</option>
-                        <option value="Transformation">Transformation</option>
-                        <option value="Product Reviews">Product Reviews</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-[9px] font-mono uppercase text-stone-500 mb-1 font-bold">Views Count</label>
-                      <input 
-                        type="number" 
-                        required
-                        value={newReelViews}
-                        onChange={(e) => setNewReelViews(Number(e.target.value))}
-                        className="bg-stone-50 border border-brand-blush/20 text-xs px-2.5 py-1.5 rounded-lg w-full focus:outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3.5">
-                    <div>
-                      <label className="block text-[9px] font-mono uppercase text-stone-500 mb-1 font-bold">Engagement Rate (%)</label>
-                      <input 
-                        type="number" 
-                        step="0.1"
-                        required
-                        value={newReelEr}
-                        onChange={(e) => setNewReelEr(Number(e.target.value))}
-                        className="bg-stone-50 border border-brand-blush/20 text-xs px-2.5 py-1.5 rounded-lg w-full focus:outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[9px] font-mono uppercase text-stone-500 mb-1 font-bold">Published Date</label>
-                      <input 
-                        type="text" 
-                        disabled 
-                        value="TODAY (Auto)"
-                        className="bg-stone-100 border border-zinc-200 text-stone-400 text-xs px-2.5 py-1.5 rounded-lg w-full cursor-not-allowed"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-[9px] font-mono uppercase text-stone-500 mb-1 font-bold">Thumbnail Asset URL</label>
-                    <input 
-                      type="text" 
-                      value={newReelThumbnail}
-                      onChange={(e) => setNewReelThumbnail(e.target.value)}
-                      className="bg-stone-50 border border-brand-blush/20 text-xs px-3 py-1.5 rounded-lg w-full font-mono text-[10px] focus:outline-none"
-                    />
-                    <p className="text-[8.5px] text-stone-400 mt-1">Placeholder images default to highly curated swatches.</p>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full bg-brand-rose hover:bg-brand-dark text-white py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors mt-2"
-                  >
-                    Add Reel to CMS Live Grids
-                  </button>
-
-                </form>
+            {/* Follower comments and messages list */}
+            <div className="lg:col-span-8 bg-white p-5 rounded-3xl border border-brand-blush/10 shadow-sm">
+              <div className="flex justify-between items-center pb-4 mb-4 border-b border-stone-100">
+                <div>
+                  <h3 className="font-serif text-base font-bold text-brand-dark">Direct Follower Interaction Log</h3>
+                  <p className="text-[11px] text-stone-500">Track and respond to those who text you, comment, or send Instagram and Facebook messages.</p>
+                </div>
+                <span className="font-mono text-[10px] bg-brand-sand text-brand-rose px-2 py-1 rounded-full font-bold">
+                  {messages.filter(m => !m.replied).length} Waiting response
+                </span>
               </div>
 
-              {/* Display list of reels editable (Right lg:col-span-7) */}
-              <div className="lg:col-span-7 bg-white p-5 rounded-3xl border border-brand-blush/20 shadow-sm">
-                <h3 className="font-serif text-md font-bold border-b border-stone-100 pb-3.5 mb-4">Reels Metadata List ({reels.length} Items)</h3>
-                
-                <div className="space-y-3 max-h-[440px] overflow-y-auto pr-2">
-                  {reels.map((rl) => (
-                    <div key={rl.id} className="p-3 bg-stone-50 border border-zinc-100 rounded-xl flex items-center justify-between gap-3 text-left">
-                      <div className="flex items-center gap-3">
-                        <img src={rl.thumbnail} alt={rl.title} className="w-10 h-10 object-cover rounded-lg shrink-0" referrerPolicy="no-referrer" />
-                        <div>
-                          <p className="font-serif text-xs font-bold text-brand-dark line-clamp-1">{rl.title}</p>
-                          <p className="text-[9.5px] text-brand-rose font-mono font-bold mt-0.5 uppercase">{rl.category} • {rl.views.toLocaleString()} views • ER {rl.engagementRate}%</p>
-                        </div>
+              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                {messages.map((msg) => (
+                  <div 
+                    key={msg.id} 
+                    className={`p-4 rounded-2xl border transition-all ${
+                      msg.replied 
+                        ? "bg-stone-50/50 border-stone-100 opacity-80" 
+                        : "bg-white border-brand-blush/20 shadow-sm"
+                    }`}
+                  >
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+                      <div className="flex items-center gap-2">
+                        {msg.platform === "Instagram Comment" && <Instagram size={14} className="text-pink-600" />}
+                        {msg.platform === "Instagram DM" && <Instagram size={14} className="text-purple-600" />}
+                        {msg.platform === "Facebook Message" && <Facebook size={14} className="text-blue-600" />}
+                        <strong className="text-brand-dark text-xs">{msg.senderName}</strong>
+                        <span className="text-[10px] font-mono text-stone-400">{msg.senderHandle}</span>
                       </div>
 
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9.5px] font-mono text-stone-400">{msg.date}</span>
+                        <span className={`text-[8.5px] font-bold px-2 py-0.5 rounded-full uppercase ${
+                          msg.replied ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700 animate-pulse"
+                        }`}>
+                          {msg.replied ? "Replied" : "Unanswered"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-stone-50 rounded-xl border border-stone-100 mb-3">
+                      <p className="text-stone-700 text-xs">"{msg.messageText}"</p>
+                      {msg.targetPost && (
+                        <p className="text-[9.5px] text-brand-rose mt-1.5 font-sans">
+                          📌 Post source: <strong>{msg.targetPost}</strong>
+                        </p>
+                      )}
+                      {msg.keywordTriggered && (
+                        <p className="text-[9.5px] text-[#4F7942] font-mono mt-1 font-bold">
+                          🤖 Trigger word detected: comment "{msg.keywordTriggered}"
+                        </p>
+                      )}
+                    </div>
+
+                    {msg.replied && msg.replyText && (
+                      <div className="p-3 bg-brand-sand/20 rounded-xl border border-brand-blush/10 text-xs ml-4 mb-2">
+                        <p className="text-stone-500 font-semibold mb-0.5">My response sent to follower:</p>
+                        <p className="text-stone-700">"{msg.replyText}"</p>
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-2 justify-end">
                       <button
-                        onClick={() => deleteReel(rl.id)}
-                        className="text-stone-400 hover:text-red-600 transition-colors p-1"
-                        title="Delete reel entry"
+                        onClick={() => handleToggleRepliedState(msg.id, msg.replied)}
+                        className="text-[11px] font-sans text-stone-500 hover:text-brand-rose hover:underline"
                       >
-                        <Trash2 size={13} />
+                        {msg.replied ? "Mark as Unanswered" : "Mark as Replied"}
                       </button>
+
+                      {!msg.replied && replyInputId !== msg.id && (
+                        <button
+                          onClick={() => {
+                            setReplyInputId(msg.id);
+                            setReplyTextValue("");
+                          }}
+                          className="bg-brand-rose hover:bg-brand-dark text-white text-[10.5px] font-bold px-3 py-1 rounded-lg transition-colors cursor-pointer"
+                        >
+                          Write Reply
+                        </button>
+                      )}
+
+                      {replyInputId === msg.id && (
+                        <button
+                          onClick={() => setReplyInputId(null)}
+                          className="text-[11px] hover:underline text-stone-400 p-1 font-sans"
+                        >
+                          Cancel
+                        </button>
+                      )}
                     </div>
-                  ))}
-                </div>
-              </div>
 
-            </div>
-
-          </div>
-        )}
-
-        {/* ================= VIEW: AFFILIATES TRACKING PAGE ================= */}
-        {activeSubTab === "affiliates" && (
-          <div className="space-y-6 animate-fadeIn text-left" id="os-affiliates-portal">
-            
-            {/* Split layout: products grid + commissions summary */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              
-              {/* Programs grid table (Left lg:col-span-8) */}
-              <div className="lg:col-span-8 bg-white p-5 rounded-3xl border border-brand-blush/20 shadow-sm">
-                <div className="flex justify-between items-center border-b border-stone-100 pb-4 mb-4">
-                  <h3 className="font-serif text-lg font-bold">Active Affiliate Programs</h3>
-                  <span className="font-mono text-[9px] bg-brand-rose/15 text-brand-rose px-2 py-0.5 rounded font-bold">
-                    Tracking Portal Syncing
-                  </span>
-                </div>
-
-                <div className="space-y-4">
-                  {affiliates.map((aff) => {
-                    const conversionRate = aff.clicks > 0 ? ((aff.salesCount / aff.clicks) * 100).toFixed(1) : "0";
-                    return (
-                      <div key={aff.id} className="p-4 rounded-2xl bg-brand-sand/20 border border-brand-blush/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div className="flex items-center gap-3.5 self-start sm:self-center">
-                          <img src={aff.thumbnail} alt={aff.name} className="w-12 h-12 object-cover rounded-xl shrink-0 border border-brand-blush/20" referrerPolicy="no-referrer" />
-                          <div className="text-left">
-                            <h4 className="font-serif text-sm font-bold text-brand-dark">{aff.name}</h4>
-                            <p className="text-[10px] text-stone-500 font-sans mt-0.5">{aff.brand} • Category: {aff.category}</p>
-                            <p className="text-[10px] text-brand-rose font-semibold mt-1">Review: &quot;{aff.rakheeReview}&quot;</p>
-                          </div>
-                        </div>
-
-                        {/* Conversions / Sales KPIs */}
-                        <div className="grid grid-cols-3 gap-6 text-center text-xs w-full sm:w-auto self-end border-t sm:border-t-0 border-brand-blush/10 pt-3 sm:pt-0">
-                          <div>
-                            <p className="font-mono font-bold">{aff.clicks}</p>
-                            <span className="text-[8.5px] text-stone-400 font-mono font-semibold uppercase tracking-wider">Clicks</span>
-                          </div>
-                          <div>
-                            <p className="font-mono font-bold">{aff.salesCount}</p>
-                            <span className="text-[8.5px] text-stone-400 font-mono font-semibold uppercase tracking-wider">Sales</span>
-                          </div>
-                          <div>
-                            <p className="font-mono font-bold text-green-600">${aff.revenueGenerated.toFixed(2)}</p>
-                            <span className="text-[8.5px] text-stone-400 font-mono font-semibold uppercase tracking-wider">Earned</span>
-                          </div>
+                    {replyInputId === msg.id && (
+                      <div className="mt-3 bg-brand-sand/20 p-3 rounded-xl border border-brand-blush/10">
+                        <label className="block text-[10px] text-stone-500 font-semibold mb-1">Direct message / comment response draft:</label>
+                        <div className="flex gap-2">
+                          <input 
+                            type="text" 
+                            placeholder="Type comforting answer or product tips..."
+                            value={replyTextValue}
+                            onChange={(e) => setReplyTextValue(e.target.value)}
+                            className="bg-white border border-brand-blush/20 rounded-lg px-2.5 py-1.5 focus:outline-none text-xs flex-1 text-stone-700"
+                            autoFocus
+                          />
+                          <button
+                            onClick={() => handleSendReplyToFollower(msg.id)}
+                            className="bg-brand-dark hover:bg-brand-rose text-white px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 flex items-center gap-1 cursor-pointer"
+                          >
+                            <Send size={11} />
+                            <span>Send</span>
+                          </button>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
 
+            {/* Direct Instant Dm Automation Configuration setup */}
+            <div className="lg:col-span-4 bg-white p-5 rounded-3xl border border-brand-blush/10 shadow-sm space-y-4">
+              <div>
+                <h3 className="font-serif text-base font-bold text-brand-dark border-b border-stone-100 pb-2 mb-2">
+                  Comment-to-DM Setup
+                </h3>
+                <p className="text-[11px] text-stone-500 leading-relaxed">
+                  We configure rules so when a follower comments a specific word on your videos, Instagram automatically DMs them your affiliate link instantly!
+                </p>
               </div>
 
-              {/* Commission rules cards (Right lg:col-span-4) */}
-              <div className="lg:col-span-4 bg-white p-5 rounded-3xl border border-brand-blush/20 shadow-sm">
-                <h3 className="font-serif text-md font-bold mb-3 border-b border-stone-100 pb-3.5">Integrated Marketplaces</h3>
-                
-                <div className="space-y-3.5 text-xs text-stone-600 font-sans">
-                  <div className="p-3 bg-brand-sand/50 rounded-xl border border-brand-blush/10">
-                    <p className="font-serif text-xs font-bold text-brand-dark">ShopMy Premium Suite</p>
-                    <p className="text-[10.5px] mt-1 leading-relaxed">Integrated directly inside @blushwithrakhee&apos;s personal showcase. Direct DM keywords forward to shopmy catalog links automatically.</p>
-                    <div className="flex justify-between mt-2.5 font-mono text-[9px]">
-                      <span>Average commissions:</span>
-                      <span className="text-brand-rose font-bold">12% - 15% Standard</span>
-                    </div>
-                  </div>
-
-                  <div className="p-3 bg-brand-sand/50 rounded-xl border border-brand-blush/10">
-                    <p className="font-serif text-xs font-bold text-brand-dark">LTK Beauty Hub</p>
-                    <p className="text-[10.5px] mt-1 leading-relaxed">Secondary link-clicks tracking for seasonal makeup transformations and beauty hacks uploads.</p>
-                    <div className="flex justify-between mt-2.5 font-mono text-[9px]">
-                      <span>Average commissions:</span>
-                      <span className="text-brand-rose font-bold">10% Standard</span>
-                    </div>
-                  </div>
+              <div className="p-4 bg-brand-sand/35 rounded-2xl space-y-3">
+                <div>
+                  <label className="block text-[10px] font-mono uppercase text-stone-400 font-bold mb-1">Comment Word Trigger</label>
+                  <input 
+                    type="text" 
+                    value={automationKeyword}
+                    onChange={(e) => setAutomationKeyword(e.target.value.toUpperCase())}
+                    className="w-full bg-white border border-brand-blush/20 rounded-xl px-3 py-1.5 text-xs text-brand-dark uppercase font-mono font-bold"
+                  />
+                  <p className="text-[9.5px] text-stone-400 mt-0.5">Follower type this under comments.</p>
                 </div>
+
+                <div>
+                  <label className="block text-[10px] font-mono uppercase text-stone-400 font-bold mb-1">Auto-Response Message Draft</label>
+                  <textarea 
+                    rows={4}
+                    value={automationReplyText}
+                    onChange={(e) => setAutomationReplyText(e.target.value)}
+                    className="w-full bg-white border border-brand-blush/20 rounded-xl p-2 text-[11px] text-stone-700 focus:outline-none"
+                  />
+                  <p className="text-[9.5px] text-stone-400 mt-0.5 text-right font-mono">Include ShopMy url link here.</p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => alert("Auto DM automated reply saved! Simulated triggers will now deploy this template.")}
+                  className="w-full bg-brand-dark hover:bg-brand-rose text-white text-xs font-bold py-2 rounded-xl transition-colors cursor-pointer"
+                >
+                  Save Active Auto-Rule
+                </button>
               </div>
 
+              <div className="border border-brand-blush/20 rounded-2xl p-3.5 space-y-2">
+                <p className="font-serif text-xs font-bold text-brand-dark">How to trigger DM demo</p>
+                <ol className="text-[10.5px] text-stone-500 list-decimal pl-4 space-y-1">
+                  <li>Go to your homepage video showcase pool</li>
+                  <li>Click on any wear-test or swatch Reel</li>
+                  <li>Type standard test comment <strong className="font-mono text-brand-rose bg-brand-sand px-1 font-bold">GLOW</strong></li>
+                  <li>An automated DM will instantly fire in simulated state!</li>
+                </ol>
+              </div>
             </div>
 
           </div>
         )}
 
-        {/* ================= VIEW: NEWSLETTER EMAIL SUBSCRIBERS ================= */}
-        {activeSubTab === "newsletter" && (
-          <div className="bg-white p-6 rounded-3xl border border-brand-blush/20 shadow-sm text-left animate-fadeIn" id="os-newsletter-portal">
-            <div className="flex justify-between items-center border-b border-stone-100 pb-4 mb-4 flex-wrap gap-2">
+        {/* ================= TAB 3: VIDEO POSTS (CONTENT) ================= */}
+        {activeTab === "video-posts" && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 text-left animate-fadeIn">
+            
+            <div className="lg:col-span-8 bg-white p-5 rounded-3xl border border-brand-blush/10 shadow-sm">
+              <h3 className="font-serif text-base font-bold text-brand-dark pb-3 border-b border-stone-100 mb-4">My Reel Post Directory</h3>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {reels.map((rl) => (
+                  <div key={rl.id} className="p-3 bg-[#FAF8F5] border border-brand-blush/10 rounded-2xl flex items-center gap-3">
+                    <img 
+                      src={rl.thumbnail} 
+                      alt={rl.title} 
+                      className="w-12 h-12 rounded-xl object-cover shrink-0 border border-brand-blush/10" 
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="text-left flex-grow min-w-0">
+                      <p className="font-serif text-xs font-bold text-brand-dark line-clamp-1">{rl.title}</p>
+                      <p className="text-[10px] text-brand-rose font-mono font-semibold mt-0.5">{rl.category}</p>
+                      <div className="flex items-center gap-3 mt-1.5 text-[9.5px] text-stone-400 font-mono">
+                        <span>👁️ {rl.views.toLocaleString()} visits</span>
+                        <span>⭐ ER: {rl.engagementRate}%</span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        if(confirm("Remove this post from website?")) deleteReel(rl.id);
+                      }}
+                      className="text-stone-300 hover:text-red-500 p-1"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="lg:col-span-4 bg-white p-5 rounded-3xl border border-brand-blush/10 shadow-sm">
+              <h3 className="font-serif text-base font-bold text-brand-dark border-b border-stone-100 pb-2.5 mb-3">Add Video Post</h3>
+              <form onSubmit={handlePublishReel} className="space-y-4 text-xs font-sans">
+                <div>
+                  <label className="block text-stone-500 font-semibold mb-1">Reel Video Title</label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="e.g. Rare Soft Pinch Blush Wear-test Shade Happy" 
+                    value={newReelTitle}
+                    onChange={(e) => setNewReelTitle(e.target.value)}
+                    className="w-full bg-[#FAF8F5] border border-brand-blush/20 rounded-xl px-3 py-2 text-xs focus:outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-stone-500 font-semibold mb-1">Beauty Category</label>
+                    <select
+                      value={newReelCategory}
+                      onChange={(e) => setNewReelCategory(e.target.value as InstagramReel["category"])}
+                      className="w-full bg-[#FAF8F5] border border-brand-blush/20 rounded-xl px-2 py-2 text-xs text-stone-700 font-medium focus:outline-none"
+                    >
+                      <option value="Skincare">Skincare</option>
+                      <option value="Makeup Tutorial">Makeup Tutorial</option>
+                      <option value="Beauty Hack">Beauty Hack</option>
+                      <option value="GRWM">GRWM</option>
+                      <option value="Transformation">Transformation</option>
+                      <option value="Product Reviews">Product Reviews</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-stone-500 font-semibold mb-1">Views Count</label>
+                    <input 
+                      type="number" 
+                      required
+                      value={newReelViews}
+                      onChange={(e) => setNewReelViews(Number(e.target.value))}
+                      className="w-full bg-[#FAF8F5] border border-brand-blush/20 rounded-xl px-3 py-2 text-xs focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-stone-500 font-semibold mb-1">Engagement Avg Rate (%)</label>
+                  <input 
+                    type="number" 
+                    step="0.1"
+                    required
+                    value={newReelEr}
+                    onChange={(e) => setNewReelEr(Number(e.target.value))}
+                    className="w-full bg-[#FAF8F5] border border-brand-blush/20 rounded-xl px-3 py-2 text-xs focus:outline-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-brand-dark hover:bg-brand-rose text-white font-bold py-2.5 rounded-xl transition-all cursor-pointer text-xs"
+                >
+                  Publish Video Post
+                </button>
+              </form>
+            </div>
+
+          </div>
+        )}
+
+        {/* ================= TAB 4: AFFILIATE LINKS ================= */}
+        {activeTab === "affiliate-links" && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 text-left animate-fadeIn">
+            
+            <div className="lg:col-span-8 bg-white p-5 rounded-3xl border border-brand-blush/10 shadow-sm">
+              <div className="flex justify-between items-center pb-3 border-b border-stone-100 mb-4">
+                <h3 className="font-serif text-base font-bold text-brand-dark">Affiliate Click &amp; Earnings Recorder</h3>
+                <span className="text-[10px] bg-green-50 text-emerald-700 px-2 py-0.5 rounded font-bold font-mono">
+                  Syncing active Storefront
+                </span>
+              </div>
+
+              <div className="space-y-4">
+                {affiliates.map((aff) => (
+                  <div key={aff.id} className="p-4 rounded-2xl bg-[#FAF8F5] border border-brand-blush/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <img 
+                        src={aff.thumbnail} 
+                        alt={aff.name} 
+                        className="w-12 h-12 object-cover rounded-xl shrink-0 border border-brand-blush/10" 
+                        referrerPolicy="no-referrer"
+                      />
+                      <div>
+                        <h4 className="font-serif text-sm font-bold text-brand-dark leading-tight">{aff.name}</h4>
+                        <p className="text-[10.5px] text-stone-500 font-sans mt-0.5">{aff.brand} • Brand Link: <strong className="text-zinc-600 font-mono text-[9px]">{aff.affiliateUrl}</strong></p>
+                        <p className="text-[10.5px] text-brand-rose font-medium mt-1 italic">"{aff.rakheeReview}"</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-6 text-center text-xs w-full sm:w-auto border-t sm:border-t-0 border-brand-blush/10 pt-3 sm:pt-0">
+                      <div>
+                        <p className="font-mono font-bold text-brand-rose">{aff.clicks}</p>
+                        <span className="text-[9px] text-stone-400 font-sans font-bold uppercase">Clicks</span>
+                      </div>
+                      <div>
+                        <p className="font-mono font-bold text-brand-dark">{aff.salesCount}</p>
+                        <span className="text-[9px] text-stone-400 font-sans font-bold uppercase">Buyers</span>
+                      </div>
+                      <div>
+                        <p className="font-mono font-bold text-green-600">{formatPrice(aff.revenueGenerated, 2)}</p>
+                        <span className="text-[9px] text-stone-400 font-sans font-bold uppercase">Earnings</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="lg:col-span-4 bg-white p-5 rounded-3xl border border-brand-blush/10 shadow-sm text-xs text-stone-600">
+              <h3 className="font-serif text-base font-bold text-brand-dark mb-3 pb-2 border-b border-stone-100">Integrated Catalog</h3>
+              <p className="leading-relaxed mb-4">
+                We bundle products directly on ShopMy &amp; LTK. Whenever you update these, direct response commentautomations send the active link down follower chat tubes.
+              </p>
+
+              <div className="space-y-3">
+                <div className="p-3.5 bg-brand-sand/35 rounded-xl border border-brand-blush/10 text-left">
+                  <p className="font-serif text-xs font-bold text-brand-dark">ShopMy Catalog Integration</p>
+                  <p className="text-[10.5px] text-stone-500 mt-1">Gives followers 12-15% discount matches on selected creams &amp; correct shade items.</p>
+                </div>
+                <div className="p-3.5 bg-brand-sand/35 rounded-xl border border-brand-blush/10 text-left">
+                  <p className="font-serif text-xs font-bold text-brand-dark">LTK Beauty Hub</p>
+                  <p className="text-[10.5px] text-stone-500 mt-1">Secondary catalog references for seasonal tutorials and GRWM sound transitions.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* ================= TAB 5: NEWSLETTER FRIENDS ================= */}
+        {activeTab === "newsletter-friends" && (
+          <div className="bg-white p-6 rounded-3xl border border-brand-blush/10 shadow-sm text-left animate-fadeIn">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-stone-100 mb-6">
               <div>
-                <h3 className="font-serif text-lg font-bold">Registered Community Subscribers</h3>
-                <p className="text-[10px] text-stone-500 font-sans mt-0.5">Showing list of registered users via hero/newsletter forms.</p>
+                <h3 className="font-serif text-base font-bold text-brand-dark">My Newsletter Family List</h3>
+                <p className="text-[11px] text-stone-500">List of subscribers who requested shade swatch cards and dewy skincare routines.</p>
               </div>
 
               <button
-                onClick={fileRefExport}
-                className="inline-flex items-center gap-1 bg-brand-rose hover:bg-brand-dark text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors"
+                onClick={handleExportSubscribers}
+                className="bg-brand-dark hover:bg-brand-rose text-white text-xs font-bold uppercase tracking-wider py-2 px-4 rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
               >
                 <Download size={13} />
-                <span>Export to CSV</span>
+                <span>Download as Excel/CSV</span>
               </button>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs font-sans text-stone-700">
+              <table className="w-full text-xs font-sans text-stone-600">
                 <thead>
-                  <tr className="border-b border-stone-100 uppercase text-[9px] text-stone-400 font-bold font-mono">
-                    <th className="pb-3.5">Name</th>
-                    <th className="pb-3.5">Email address</th>
-                    <th className="pb-3.5">Interests Checklist selection</th>
-                    <th className="pb-3.5 text-right font-mono">Date joined</th>
+                  <tr className="border-b border-stone-100 text-[10px] uppercase font-bold text-stone-400">
+                    <th className="pb-3 text-left">Subscriber Name</th>
+                    <th className="pb-3 text-left">Email Address</th>
+                    <th className="pb-3 text-left">Checked Beauty Interests</th>
+                    <th className="pb-3 text-right">Date Joined</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-50">
-                  {subscribers.map((sub, ind) => (
-                    <tr key={sub.id} className="hover:bg-brand-sand/10 transition-colors">
+                <tbody className="divide-y divide-zinc-50">
+                  {subscribers.map((sub) => (
+                    <tr key={sub.id} className="hover:bg-stone-50">
                       <td className="py-3 font-semibold text-brand-dark">{sub.name}</td>
-                      <td className="py-3 font-mono text-zinc-600">{sub.email}</td>
+                      <td className="py-3 font-mono text-zinc-500">{sub.email}</td>
                       <td className="py-3">
                         <div className="flex flex-wrap gap-1">
                           {sub.beautyInterests.map((interest, i) => (
-                            <span key={i} className="bg-brand-sand text-brand-rose text-[8.5px] font-semibold px-2 py-0.5 rounded-full border border-brand-blush/10">
+                            <span key={i} className="bg-brand-sand text-brand-rose text-[9px] font-sans font-semibold px-2.5 py-0.5 rounded-full border border-brand-blush/10">
                               {interest}
                             </span>
                           ))}
                         </div>
                       </td>
-                      <td className="py-3 text-right font-mono font-medium">{sub.dateJoined}</td>
+                      <td className="py-3 text-right font-mono text-stone-400">{sub.dateJoined}</td>
                     </tr>
                   ))}
+                  {subscribers.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="py-6 text-center text-stone-400">No subscribers signed up yet. Code is ready!</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
-
-            <div className="mt-8 bg-brand-sand/35 p-4 rounded-2xl border border-brand-blush/20 flex flex-col sm:flex-row items-center justify-between text-xs gap-4 text-left">
-              <div>
-                <p className="font-serif text-xs font-bold text-brand-dark">Active Campaigns dispatch</p>
-                <p className="font-sans text-[11px] text-stone-500 mt-0.5">Want to alert subscribers of a new product review or code code update?</p>
-              </div>
-              <button
-                onClick={() => alert("Campaign queued successfully! Simulated email alerts dispatched layout.")}
-                className="bg-brand-dark hover:bg-brand-rose text-white px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors"
-              >
-                Simulate Direct Campaign Push
-              </button>
-            </div>
-
           </div>
         )}
 
-        {/* ================= VIEW: TRAFFIC ANALYTICS CHART ================= */}
-        {activeSubTab === "analytics" && (
-          <div className="space-y-6 animate-fadeIn text-left" id="os-analytics-portal">
+        {/* ================= TAB 6: MY NUMBERS SETUP ================= */}
+        {activeTab === "profile-stats" && (
+          <div className="max-w-2xl bg-white p-6 rounded-3xl border border-brand-blush/10 shadow-sm text-left animate-fadeIn">
+            <h3 className="font-serif text-base font-bold text-brand-dark pb-3 border-b border-stone-100 mb-4">Edit My Public Counter Targets</h3>
             
-            {/* Visual trends charts representing traffic Referral lists and device views */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-              
-              {/* Traffic graphic card (Left lg:col-span-8) */}
-              <div className="lg:col-span-8 bg-white p-5 rounded-3xl border border-brand-blush/20 shadow-sm text-left relative flex flex-col justify-between">
+            <div className="space-y-4 text-xs font-sans">
+              <p className="text-stone-500 leading-relaxed text-[11.5px]">
+                Want to update your Instagram follower totals or modify your overall average engagement percentages? Edit the fields below and click Deploy. Your homepage cards will update instantly!
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <div className="flex justify-between items-center border-b border-stone-100 pb-4 mb-4">
-                    <h3 className="font-serif text-lg font-bold">Monthly Traffic Conversions Tracker</h3>
-                    <span className="font-mono text-[9px] uppercase tracking-wider text-green-600 bg-green-50 px-2 py-0.5 rounded font-bold">
-                      Organic SEO Optimized
-                    </span>
-                  </div>
-
-                  {/* Draw beautiful high-quality vector CSS diagrams to represent real chart trends */}
-                  <div className="h-44 flex items-end justify-between gap-1 mt-6 relative border-b border-stone-100 pb-1 px-4">
-                    
-                    {/* Background helper lines */}
-                    <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-30 text-[8px] font-mono text-zinc-400">
-                      <div className="border-b border-zinc-200 w-full text-right">30k Views</div>
-                      <div className="border-b border-zinc-200 w-full text-right">15k Views</div>
-                      <div className="border-b border-zinc-200 w-full text-right">0k Views</div>
-                    </div>
-
-                    {/* Bars visual elements */}
-                    <div className="flex-1 flex flex-col items-center gap-1.5 group select-none relative z-10">
-                      <span className="text-[9px] font-mono font-bold opacity-0 group-hover:opacity-100 transition-opacity absolute -top-4 text-brand-rose">$4.2k</span>
-                      <div className="w-8 bg-brand-blush/40 group-hover:bg-brand-rose rounded-t-md h-12 transition-all duration-500" />
-                      <span className="text-[10px] font-mono font-medium text-stone-500 mt-1">Jan</span>
-                    </div>
-
-                    <div className="flex-1 flex flex-col items-center gap-1.5 group select-none relative z-10">
-                      <span className="text-[9px] font-mono font-bold opacity-0 group-hover:opacity-100 transition-opacity absolute -top-4 text-brand-rose">$5.8k</span>
-                      <div className="w-8 bg-brand-blush/40 group-hover:bg-brand-rose rounded-t-md h-20 transition-all duration-500" />
-                      <span className="text-[10px] font-mono font-medium text-stone-500 mt-1">Feb</span>
-                    </div>
-
-                    <div className="flex-1 flex flex-col items-center gap-1.5 group select-none relative z-10">
-                      <span className="text-[9px] font-mono font-bold opacity-0 group-hover:opacity-100 transition-opacity absolute -top-4 text-brand-rose">$8.1k</span>
-                      <div className="w-8 bg-brand-blush/40 group-hover:bg-brand-rose rounded-t-md h-28 transition-all duration-500" />
-                      <span className="text-[10px] font-mono font-medium text-stone-500 mt-1">Mar</span>
-                    </div>
-
-                    <div className="flex-1 flex flex-col items-center gap-1.5 group select-none relative z-10">
-                      <span className="text-[9px] font-mono font-bold opacity-0 group-hover:opacity-100 transition-opacity absolute -top-4 text-brand-rose">$10.9k</span>
-                      <div className="w-8 bg-brand-rose rounded-t-md h-36 transition-all duration-500" />
-                      <span className="text-[10px] font-mono font-medium text-stone-500 mt-1 font-bold">Today</span>
-                    </div>
-                  </div>
-
-                  <p className="font-sans text-[11px] text-stone-400 italic text-center mt-3">
-                    Hover columns to review monthly active income scaling targets.
-                  </p>
+                  <label className="block text-stone-500 font-semibold mb-1">Set Total Followers</label>
+                  <input 
+                    type="number"
+                    value={followersInput}
+                    onChange={(e) => setFollowersInput(Number(e.target.value))}
+                    className="w-full bg-[#FAF8F5] border border-brand-blush/20 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-brand-rose"
+                  />
+                  <p className="text-[10px] text-stone-400 mt-1 italic">Current total on homepage is: {stats.followers.toLocaleString()}</p>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-stone-100 bg-brand-sand/20 p-4 rounded-xl flex items-center justify-between text-xs text-stone-500">
-                  <span>Standard attribution modeling: Last-touch CRM records</span>
-                  <span>Telemetry is synced in real-time.</span>
+                <div>
+                  <label className="block text-stone-500 font-semibold mb-1">Set Average Engagement (%)</label>
+                  <input 
+                    type="number"
+                    step="0.1"
+                    value={engagementInput}
+                    onChange={(e) => setEngagementInput(Number(e.target.value))}
+                    className="w-full bg-[#FAF8F5] border border-brand-blush/20 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-brand-rose"
+                  />
+                  <p className="text-[10px] text-stone-400 mt-1 italic">Current engagement average is: {stats.engagementAvg}%</p>
                 </div>
               </div>
 
-              {/* Referral list sources card (Right lg:col-span-4) */}
-              <div className="lg:col-span-4 bg-white p-5 rounded-3xl border border-brand-blush/20 shadow-sm flex flex-col justify-between text-left">
-                <div>
-                  <h3 className="font-serif text-md font-bold border-b border-stone-100 pb-3.5 mb-4">Traffic Channel Sources</h3>
-                  
-                  <div className="space-y-3 font-sans text-xs text-stone-600">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium font-serif">Instagram Stories</span>
-                      <span className="font-mono font-bold text-brand-rose">48% Traffic share</span>
-                    </div>
-                    <div className="w-full bg-stone-100 h-1 rounded-full"><div className="bg-[#B76E79] h-full rounded-full w-48%" /></div>
-
-                    <div className="flex items-center justify-between mt-3">
-                      <span className="font-medium font-serif">Reels Caption Automations</span>
-                      <span className="font-mono font-bold text-brand-rose">35% Traffic share</span>
-                    </div>
-                    <div className="w-full bg-stone-100 h-1 rounded-full"><div className="bg-[#B76E79] h-full rounded-full w-[35%]" /></div>
-
-                    <div className="flex items-center justify-between mt-3">
-                      <span className="font-medium font-serif">Direct Organic Bio links</span>
-                      <span className="font-mono font-bold text-brand-rose">17% Traffic share</span>
-                    </div>
-                    <div className="w-full bg-stone-100 h-1 rounded-full"><div className="bg-[#B76E79] h-full rounded-full w-[17%]" /></div>
-                  </div>
-                </div>
-
-                <div className="mt-8 pt-4 border-t border-stone-100 bg-[#E8C8C8]/10 p-3.5 rounded-2xl border border-[#E8C8C8]/25 text-xs text-brand-rose text-center font-bold">
-                  Conversion Rate Ratio: 8.8% average
-                </div>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={handleUpdateViewsStats}
+                  className="bg-brand-rose hover:bg-brand-dark text-white font-bold py-2.5 px-6 rounded-xl transition-all cursor-pointer text-xs"
+                >
+                  Deploy Profile Updates Live
+                </button>
               </div>
 
+              <div className="pt-4 border-t border-stone-100 text-[10.5px] text-stone-400 space-y-1">
+                <p>💡 <em>Tip: Brands love seeing engagement averages above 5%! Keeping your engagement correct helps land boutique face cream campaigns.</em></p>
+              </div>
             </div>
-
           </div>
         )}
 
       </div>
-
     </section>
   );
 }
