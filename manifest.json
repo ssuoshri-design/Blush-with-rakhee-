@@ -1,0 +1,10 @@
+{
+  "name": "Blush with Rakhee",
+  "short_name": "Blush",
+  "description": "A growing beauty creator focused on authentic recommendations, beauty education, and building trust with a beauty-focused audience.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FCF5F3",
+  "theme_color": "#D39E82",
+  "orientation": "portrait"
+}
