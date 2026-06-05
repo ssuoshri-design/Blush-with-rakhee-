@@ -71,7 +71,9 @@ export default function TrustCollab({ onSelectService }: TrustCollabProps) {
     return () => clearInterval(brandTimer);
   }, []);
 
-  const testimonials = [
+  const [selectedReviewCategory, setSelectedReviewCategory] = useState<"All" | "Clients" | "Followers" | "Brands">("All");
+
+  const combinedTestimonials = [
     {
       id: "testi-1",
       name: "Ananya Sharma",
@@ -79,6 +81,7 @@ export default function TrustCollab({ onSelectService }: TrustCollabProps) {
       feedback: "Rakhee is an absolute magician! She did my bridal makeup and I felt so elegant and confident. The glow stayed intact all night without feeling heavy. She listened to every single detail I requested!",
       rating: 5,
       image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150",
+      category: "Clients" as const,
       tag: "Wedding Look"
     },
     {
@@ -88,6 +91,7 @@ export default function TrustCollab({ onSelectService }: TrustCollabProps) {
       feedback: "Honestly, the best party makeup experience ever! Rakhee has this beautiful way of enhancing your natural features without making you look caked. I got hundreds of compliments on my dewy reception glow!",
       rating: 5,
       image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150",
+      category: "Clients" as const,
       tag: "Reception Glow"
     },
     {
@@ -97,9 +101,54 @@ export default function TrustCollab({ onSelectService }: TrustCollabProps) {
       feedback: "As a product reviewer myself, I’m extremely particular. Rakhee's recommendations are so honest and her makeup techniques are flawless. Her ability to blend drugstore hacks with luxury brands is unmatched.",
       rating: 5,
       image: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&q=80&w=150",
+      category: "Followers" as const,
       tag: "Coached Session"
+    },
+    {
+      id: "testi-4",
+      name: "Elena Vasquez",
+      role: "Campaign Lead @ Glow Cosmetics",
+      feedback: "Working with Rakhee was one of our highest-converting small creator collaborations. Her GRWM video generated 40+ immediate coupon code activations because her community genuinely hangs on and trusts her product reviews.",
+      rating: 5,
+      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150",
+      category: "Brands" as const,
+      tag: "Brand Partner"
+    },
+    {
+      id: "testi-5",
+      name: "Prisha Sharma",
+      role: "Passionate Supporter",
+      feedback: "Rakhee's concealer hack changed how I prepare for work! I always thought makeup was too complex for South Asian hyperpigmentation, but she breaks it down so simply without making us cover our natural skin beauty.",
+      rating: 5,
+      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=150",
+      category: "Followers" as const,
+      tag: "Community Friend"
+    },
+    {
+      id: "testi-6",
+      name: "Marcus Chen",
+      role: "Brand Director @ Aurora Skincare",
+      feedback: "Rakhee delivered beautiful, authentic video content for our product launch that resonated perfectly with beauty enthusiasts. She was highly professional, creative, and a pleasure to work with!",
+      rating: 5,
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150",
+      category: "Brands" as const,
+      tag: "Brand Partner"
+    },
+    {
+      id: "testi-7",
+      name: "Meera Patel",
+      role: "Follower since Reel #3",
+      feedback: "Your reviews are the only ones on IG that don't look artificially filtered! That peach swatch wear-test post saved me $40 on that viral toner that actually dries out oily skin. Love your transparency!",
+      rating: 5,
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150",
+      category: "Followers" as const,
+      tag: "Instagram Fan"
     }
   ];
+
+  const filteredReviews = selectedReviewCategory === "All"
+    ? combinedTestimonials
+    : combinedTestimonials.filter(t => t.category === selectedReviewCategory);
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -321,18 +370,47 @@ export default function TrustCollab({ onSelectService }: TrustCollabProps) {
 
         {/* ================= TESTIMONIAL CARDS (FULL WIDTH DECK) ================= */}
         <div className="scroll-mt-20" id="brand-collab-testimonials">
-          <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+          <div className="text-center max-w-2xl mx-auto mb-10">
             <span className="font-mono text-xs text-brand-rose uppercase tracking-[0.25em] font-bold block mb-2">
-              REAL TESTIMONIALS
+              REAL BEAUTY • REAL RESULTS • REAL TRUST
             </span>
             <h2 className="font-serif text-3xl lg:text-4xl text-brand-dark font-medium leading-tight">
-              What People Say About Rakhee
+              What My Community Says
             </h2>
+            <p className="font-sans text-stone-500 mt-3 text-xs leading-relaxed max-w-lg mx-auto">
+              Read real, unedited reviews and genuine results from bridal clients, passionate community followers, and beauty brand partners.
+            </p>
             <div className="w-12 h-1 bg-brand-rose/60 mx-auto mt-4 rounded-full" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testi) => (
+          {/* Elegant Category Filter Tabs */}
+          <div className="flex flex-wrap justify-center gap-2 mb-10 max-w-xl mx-auto">
+            {(["All", "Clients", "Followers", "Brands"] as const).map((category) => {
+              const labelMap = {
+                All: "All Reviews 💖",
+                Clients: "Bridal & Glam Clients 💄",
+                Followers: "Community Followers 🌸",
+                Brands: "Brand Partners 🎯"
+              };
+              const active = selectedReviewCategory === category;
+              return (
+                <button
+                  key={category}
+                  onClick={() => setSelectedReviewCategory(category)}
+                  className={`px-4 py-2 rounded-full text-xs font-serif font-bold tracking-wide transition-all border cursor-pointer ${
+                    active
+                      ? "bg-brand-rose border-transparent text-white shadow-md shadow-brand-rose/15"
+                      : "bg-white border-brand-blush/20 text-stone-600 hover:bg-brand-sand/30"
+                  }`}
+                >
+                  {labelMap[category]}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 min-h-[300px]">
+            {filteredReviews.map((testi) => (
               <div
                 key={testi.id}
                 className="bg-white p-7 rounded-3xl border border-brand-blush/25 hover:border-brand-rose/60 transition-all duration-300 shadow-sm hover:shadow-xl text-left flex flex-col justify-between hover:-translate-y-1"
@@ -344,7 +422,7 @@ export default function TrustCollab({ onSelectService }: TrustCollabProps) {
                     ))}
                   </div>
 
-                  <p className="font-sans text-xs sm:text-sm text-stone-600 italic leading-relaxed mb-6 text-left">
+                  <p className="font-sans text-xs sm:text-xs text-stone-600 italic leading-relaxed mb-6 text-left">
                     "{testi.feedback}"
                   </p>
                 </div>
@@ -357,7 +435,7 @@ export default function TrustCollab({ onSelectService }: TrustCollabProps) {
                       className="w-10 h-10 rounded-full object-cover border border-brand-blush"
                       referrerPolicy="no-referrer"
                     />
-                    <span className="absolute -bottom-1 -right-1 bg-brand-rose text-white p-0.5 rounded-full text-[6px]">💖</span>
+                    <span className="absolute -bottom-1 -right-1 bg-brand-rose text-white p-0.5 rounded-full text-[6px]">✨</span>
                   </div>
                   <div className="text-left">
                     <h4 className="font-serif text-sm font-bold text-brand-dark">{testi.name}</h4>

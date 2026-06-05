@@ -364,3 +364,143 @@ export const initialCreatorMessages: CreatorMessage[] = [
   }
 ];
 
+export const initialRewardsConfig = [
+  {
+    id: "rew-1",
+    name: "5% Welcome Glam Bonus",
+    type: "discount" as const,
+    value: 5,
+    label: "5% Course Mentorship Discount",
+    code: "BLUSH5",
+    isEnabled: true,
+    expiryDate: "2026-12-31",
+    maxClaims: 150,
+    claimsCount: 42,
+    usedCount: 16,
+    eligibleCourses: ["Beauty Foundations Course", "Advanced Artist Program", "Professional Makeup Business Mastery"]
+  },
+  {
+    id: "rew-2",
+    name: "10% Signature Artist Discount",
+    type: "discount" as const,
+    value: 10,
+    label: "10% Professional Artistry Code",
+    code: "GLAM10",
+    isEnabled: true,
+    expiryDate: "2026-10-31",
+    maxClaims: 80,
+    claimsCount: 29,
+    usedCount: 11,
+    eligibleCourses: ["Beauty Foundations Course", "Advanced Artist Program"]
+  },
+  {
+    id: "rew-3",
+    name: "20% Elite Mastery Bonus",
+    type: "discount" as const,
+    value: 20,
+    label: "20% Business Mastery Platinum discount",
+    code: "MASTERY20",
+    isEnabled: true,
+    expiryDate: "2026-08-30",
+    maxClaims: 30,
+    claimsCount: 14,
+    usedCount: 6,
+    eligibleCourses: ["Professional Makeup Business Mastery"]
+  },
+  {
+    id: "rew-4",
+    name: "Complimentary Swatch Guide",
+    type: "freebie" as const,
+    value: 0,
+    label: "Free South Asian Undertones Makeup Mastery eBook",
+    code: "FREEUNDERTONES",
+    isEnabled: true,
+    expiryDate: "2026-11-30",
+    maxClaims: 200,
+    claimsCount: 68,
+    usedCount: 68,
+    eligibleCourses: ["Beauty Foundations Course", "Advanced Artist Program"]
+  },
+  {
+    id: "rew-5",
+    name: "1-on-1 Artist Consult Strategy",
+    type: "freebie" as const,
+    value: 0,
+    label: "Complimentary 15-Minute Video Consultation Strategy session",
+    code: "RUSHCONSULT",
+    isEnabled: true,
+    expiryDate: "2026-09-15",
+    maxClaims: 25,
+    claimsCount: 8,
+    usedCount: 4,
+    eligibleCourses: ["Professional Makeup Business Mastery"]
+  }
+];
+
+export const initialRewardClaims = [
+  {
+    id: "claim-1",
+    userName: "Meera Iyer",
+    userEmail: "meera.iyer@gmail.com",
+    userPhone: "+91 98845 11223",
+    rewardId: "rew-1",
+    rewardLabel: "5% Course Mentorship Discount",
+    code: "BLUSH5",
+    couponUsed: true,
+    usedForCourse: "Beauty Foundations Course",
+    timestamp: "2026-06-04T10:14:00Z",
+    revenueAmount: 142.5 // $150 minus 5%
+  },
+  {
+    id: "claim-2",
+    userName: "Aisha Patel",
+    userEmail: "aisha.patel@yahoo.com",
+    userPhone: "+91 99204 88776",
+    rewardId: "rew-2",
+    rewardLabel: "10% Professional Artistry Code",
+    code: "GLAM10",
+    couponUsed: true,
+    usedForCourse: "Advanced Artist Program",
+    timestamp: "2026-06-03T15:32:00Z",
+    revenueAmount: 315 // $350 minus 10%
+  },
+  {
+    id: "claim-3",
+    userName: "Riddhi Shah",
+    userEmail: "riddhi_shah@hotmail.com",
+    userPhone: "+91 98112 55432",
+    rewardId: "rew-4",
+    rewardLabel: "Free South Asian Undertones Makeup Mastery eBook",
+    code: "FREEUNDERTONES",
+    couponUsed: true,
+    usedForCourse: "Beauty Foundations Course",
+    timestamp: "2026-06-03T08:12:00Z",
+    revenueAmount: 0
+  },
+  {
+    id: "claim-4",
+    userName: "Divya Tejnani",
+    userEmail: "divya.t@outlook.com",
+    userPhone: "+91 98230 44556",
+    rewardId: "rew-1",
+    rewardLabel: "5% Course Mentorship Discount",
+    code: "BLUSH5",
+    couponUsed: false,
+    timestamp: "2026-06-02T18:44:00Z"
+  },
+  {
+    id: "claim-5",
+    userName: "Jasmin Gill",
+    userEmail: "jas.gill@gmail.com",
+    userPhone: "+91 98720 11993",
+    rewardId: "rew-3",
+    rewardLabel: "20% Business Mastery Platinum discount",
+    code: "MASTERY20",
+    couponUsed: true,
+    usedForCourse: "Professional Makeup Business Mastery",
+    timestamp: "2026-06-01T12:05:00Z",
+    revenueAmount: 480 // $600 minus 20%
+  }
+];
+
+

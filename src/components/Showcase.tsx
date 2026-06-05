@@ -27,12 +27,35 @@ interface TutorialCard {
 
 export default function Showcase() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [activePreview, setActivePreview] = useState<TutorialCard | null>(null);
+  const [activePreview, setActivePreview] = useState<any | null>(null);
   
   // Custom video simulator states within active modal
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [playbackTime, setPlaybackTime] = useState<number>(12);
   const [isMuted, setIsMuted] = useState<boolean>(false);
+
+  // Load containers from localStorage dynamically
+  const [assignedContainers, setAssignedContainers] = useState<Record<string, any>>(() => {
+    try {
+      const saved = localStorage.getItem("blush_instagram_containers");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      try {
+        const saved = localStorage.getItem("blush_instagram_containers");
+        setAssignedContainers(saved ? JSON.parse(saved) : {});
+      } catch (err) {
+        console.error("Error reading instagram containers:", err);
+      }
+    };
+    window.addEventListener("instagram-containers-updated", handleUpdate);
+    return () => window.removeEventListener("instagram-containers-updated", handleUpdate);
+  }, []);
 
   // Auto incremental simulation for active tutorial video play-timeline
   useEffect(() => {
@@ -48,8 +71,84 @@ export default function Showcase() {
     return () => clearInterval(interval);
   }, [activePreview, isPlaying]);
 
-  const tutorialsByCatalog: TutorialCard[] = [
-    {
+  const getMappedResult = (index: number, defaultItem: any, slotKey: string) => {
+    const assigned = assignedContainers[slotKey];
+    if (assigned) {
+      return {
+        clientName: assigned.caption ? assigned.caption.split("\n")[0] : defaultItem.clientName,
+        beforeImg: assigned.media_type === "VIDEO" && assigned.thumbnail_url ? assigned.thumbnail_url : assigned.media_url,
+        afterImg: assigned.media_url,
+        feedback: assigned.caption || defaultItem.feedback,
+        artist: assigned.username ? `@${assigned.username} Live` : defaultItem.artist,
+        isInstagram: true,
+        permalink: assigned.permalink
+      };
+    }
+    return { ...defaultItem, isInstagram: false };
+  };
+
+  const getMappedTutorial = (index: number, defaultItem: any, slotKey: string) => {
+    const assigned = assignedContainers[slotKey];
+    if (assigned) {
+      return {
+        id: slotKey,
+        title: assigned.caption ? "🎥 " + assigned.caption.split("\n")[0].substring(0, 32) + (assigned.caption.split("\n")[0].length > 32 ? "..." : "") : defaultItem.title,
+        category: assigned.media_type === "VIDEO" ? "Transformation" : "Tutorial",
+        difficulty: "Live Feed",
+        duration: "Quick Study",
+        thumbnail: assigned.media_type === "VIDEO" && assigned.thumbnail_url ? assigned.thumbnail_url : assigned.media_url,
+        quote: assigned.caption || defaultItem.quote,
+        lessonHighlights: [
+          assigned.caption ? assigned.caption.substring(0, 50) + "..." : "Official Live Instagram Content Publication",
+          "Includes interactive cosmetics application details",
+          "Check out full live coverage on @blushwithrakhee",
+          "Meta API verified sync active"
+        ],
+        featuredProducts: [
+          "Meta API Live",
+          "Instagram Reel"
+        ],
+        studentRating: "Live Verified",
+        isInstagram: true,
+        permalink: assigned.permalink
+      };
+    }
+    return { ...defaultItem, isInstagram: false };
+  };
+
+  const dynamicStudentResults = [
+    getMappedResult(0, {
+      clientName: "Aarohi's Sangeet Glam (Student Work)",
+      beforeImg: "https://images.unsplash.com/photo-1522335789253-aabd1fc54bc9?auto=format&fit=crop&q=80&w=300",
+      afterImg: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=300",
+      feedback: "Rakhee made me feel like royalty! I felt so light and my makeup stayed perfectly radiant from 3 PM all the way until our midnight afterparty. Genuinely flawless!",
+      artist: "By Batch-9 Student Tania"
+    }, "container_01"),
+    getMappedResult(1, {
+      clientName: "Meera's Royal Bridal Look",
+      beforeImg: "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&q=80&w=300",
+      afterImg: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=300",
+      feedback: "My wedding pictures turned out like a fairy tale! Her mastery with shade matching is unreal—there was zero gray cast and I looked exactly like myself, only ultra-glammed!",
+      artist: "By Instructor Rakhee"
+    }, "container_02"),
+    getMappedResult(2, {
+      clientName: "Ritika's Glass Skin Sangeet Glow",
+      beforeImg: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=80&w=300",
+      afterImg: "https://images.unsplash.com/photo-1515688594390-b649af70d282?auto=format&fit=crop&q=80&w=300",
+      feedback: "As Rakhee's hands-on student, I got to practice on real live models. This before and after was my third attempt, and Rakhee's shading techniques helped me nail the cut-crease!",
+      artist: "By Student Ritika"
+    }, "container_03"),
+    getMappedResult(3, {
+      clientName: "Elena's Crimson Soiree",
+      beforeImg: "https://images.unsplash.com/photo-1595959183075-c1d09e37b19c?auto=format&fit=crop&q=80&w=300",
+      afterImg: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&q=80&w=300",
+      feedback: "I got so many compliments at the reception soiree! The texture feels exactly like skin, no cakey weight whatsoever. Rakhee is the only artist I trust.",
+      artist: "By Professional Alumni Sanya"
+    }, "container_04")
+  ];
+
+  const dynamicTutorialsByCatalog = [
+    getMappedTutorial(0, {
       id: "class-soft-glam",
       title: "💄 Soft Glam Masterclass",
       category: "Masterclass",
@@ -69,8 +168,8 @@ export default function Showcase() {
         "Translucent Micro-Finishing Powder"
       ],
       studentRating: "4.9/5 (1,230+ Reviews)"
-    },
-    {
+    }, "container_05"),
+    getMappedTutorial(1, {
       id: "class-bridal-trans",
       title: "👰 Bridal Makeup Transformation",
       category: "Transformation",
@@ -90,8 +189,8 @@ export default function Showcase() {
         "Super-Lock Setting Mist Spray"
       ],
       studentRating: "5.0/5 (840+ Reviews)"
-    },
-    {
+    }, "container_06"),
+    getMappedTutorial(2, {
       id: "class-party-glam",
       title: "✨ Party Glam in 20 Minutes",
       category: "Tutorial",
@@ -111,8 +210,8 @@ export default function Showcase() {
         "Collagen Glow Gloss Top"
       ],
       studentRating: "4.8/5 (950+ Reviews)"
-    },
-    {
+    }, "container_07"),
+    getMappedTutorial(3, {
       id: "class-product-review",
       title: "🎥 Product Swatching & Application",
       category: "Product Study",
@@ -132,45 +231,17 @@ export default function Showcase() {
         "Smoothing Loose Setting Veil"
       ],
       studentRating: "4.9/5 (1,120+ Reviews)"
-    }
+    }, "container_08")
   ];
+
+  const studentResults = dynamicStudentResults;
+  const tutorialsByCatalog = dynamicTutorialsByCatalog;
 
   const categories = ["All", "Masterclass", "Transformation", "Tutorial", "Product Study"];
 
   const filteredTutorials = selectedCategory === "All"
     ? tutorialsByCatalog
     : tutorialsByCatalog.filter(t => t.category === selectedCategory);
-
-  const studentResults = [
-    {
-      clientName: "Aarohi's Sangeet Glam (Student Work)",
-      beforeImg: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&q=80&w=300",
-      afterImg: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=300",
-      feedback: "Rakhee made me feel like royalty! I felt so light and my makeup stayed perfectly radiant from 3 PM all the way until our midnight afterparty. Genuinely flawless!",
-      artist: "By Batch-9 Student Tania"
-    },
-    {
-      clientName: "Meera's Royal Bridal Look",
-      beforeImg: "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&q=80&w=300",
-      afterImg: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=300",
-      feedback: "My wedding pictures turned out like a fairy tale! Her mastery with shade matching is unreal—there was zero gray cast and I looked exactly like myself, only ultra-glammed!",
-      artist: "By Instructor Rakhee"
-    },
-    {
-      clientName: "Ritika's Glass Skin Sangeet Glow",
-      beforeImg: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=80&w=300",
-      afterImg: "https://images.unsplash.com/photo-1515688594390-b649af70d282?auto=format&fit=crop&q=80&w=300",
-      feedback: "As Rakhee's hands-on student, I got to practice on real live models. This before and after was my third attempt, and Rakhee's shading techniques helped me nail the cut-crease!",
-      artist: "By Student Ritika"
-    },
-    {
-      clientName: "Elena's Crimson Soiree",
-      beforeImg: "https://images.unsplash.com/photo-1595959183075-c1d09e37b19c?auto=format&fit=crop&q=80&w=300",
-      afterImg: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&q=80&w=300",
-      feedback: "I got so many compliments at the reception soiree! The texture feels exactly like skin, no cakey weight whatsoever. Rakhee is the only artist I trust.",
-      artist: "By Professional Alumni Sanya"
-    }
-  ];
 
   const coreSyllabus = [
     {

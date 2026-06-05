@@ -74,16 +74,19 @@ export default function About() {
           {/* Right Block: Biography & Story Elements */}
           <div className="lg:col-span-7 flex flex-col space-y-6 text-left" id="about-right-text">
             
-            <h3 className="font-serif text-2xl text-brand-rose italic font-medium">
-              &quot;Beauty isn't about hiding. It's about enhancing what makes you memorable.&quot;
-            </h3>
+            <div className="relative pl-6 border-l-2 border-brand-rose/30 py-1" id="creative-quote-container border">
+              <span className="absolute -left-2 top-0 text-3xl text-brand-rose/20 font-serif leading-none">“</span>
+              <h3 className="font-serif text-2xl md:text-3xl text-brand-rose italic font-medium tracking-tight leading-snug">
+                Beauty isn't about hiding. It's about enhancing what makes you memorable.
+              </h3>
+            </div>
 
             <p className="font-sans text-sm text-brand-dark/85 leading-relaxed">
-              I launched **Blush With Rakhee** as a dedicated, welcoming space in the beauty community. Realizing that many beauty reviews are heavily filtered or feel out of reach, I set out to share real, everyday makeup tips and honest skincare experiences that anyone can try.
+              I launched <span className="font-semibold text-brand-rose">Blush With Rakhee</span> as a dedicated, welcoming space in the beauty community. Realizing that many beauty reviews are heavily filtered or feel out of reach, I set out to share real, everyday makeup tips and honest skincare experiences that anyone can try.
             </p>
 
             <p className="font-sans text-sm text-brand-dark/85 leading-relaxed">
-              With **100% video-based content** on Instagram, I focus on helping women find both high-end premium cosmetics and accessible drugstore alternatives. Every Reel I publish features real skin texture, step-by-step techniques, and friendly advice that empowers my community to feel their best.
+              With <span className="font-semibold text-brand-rose">100% video-based content</span> on Instagram, I focus on helping women find both high-end premium cosmetics and accessible drugstore alternatives. Every Reel I publish features real skin texture, step-by-step techniques, and friendly advice that empowers my community to feel their best.
             </p>
 
             {/* Exclusive Quote Box */}

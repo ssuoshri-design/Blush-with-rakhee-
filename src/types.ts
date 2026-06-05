@@ -108,3 +108,45 @@ export interface CreatorMessage {
   replyText?: string;
 }
 
+export interface InstagramLibraryItem {
+  id: string;
+  caption: string;
+  media_type: "IMAGE" | "VIDEO" | "CAROUSEL_ALBUM";
+  media_url: string;
+  permalink: string;
+  thumbnail_url?: string;
+  timestamp: string;
+  username?: string;
+}
+
+export interface RewardConfig {
+  id: string;
+  name: string;
+  type: "discount" | "freebie";
+  value: number; // percentage value e.g. 5, 10, 15, 20 or 0 for freebies
+  label: string;
+  code: string;
+  isEnabled: boolean;
+  expiryDate: string;
+  maxClaims: number;
+  claimsCount: number;
+  usedCount: number;
+  eligibleCourses: string[];
+}
+
+export interface RewardClaim {
+  id: string;
+  userName: string;
+  userEmail: string;
+  userPhone: string;
+  rewardId: string;
+  rewardLabel: string;
+  code: string;
+  couponUsed: boolean;
+  usedForCourse?: string;
+  timestamp: string;
+  revenueAmount?: number;
+}
+
+
+

@@ -8,7 +8,7 @@ import {
   Mail, Star, Send, ChevronDown, ChevronUp, Check, 
   MessageSquare, HelpCircle, Instagram, Sparkles, Plus, Trash2, CheckCircle2, Facebook 
 } from "lucide-react";
-import { initialFAQs, initialTestimonials } from "../mockData";
+import { initialFAQs } from "../mockData";
 import { CollabLead, NewsletterSubscriber } from "../types";
 
 interface NewsletterContactProps {
@@ -231,58 +231,7 @@ export default function NewsletterContact({
         </div>
       </section>
 
-      {/* ================= SECTION 13: TESTIMONIALS SLIDER / GRID ================= */}
-      <section className="py-16 lg:py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 lg:px-8">
-          
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="font-mono text-xs text-brand-rose uppercase tracking-[0.25em] font-bold block mb-2">
-              WORD ON THE STREET
-            </span>
-            <h2 className="font-serif text-3xl lg:text-4xl text-brand-dark font-semibold">
-              What My Community Says
-            </h2>
-            <div className="w-12 h-1 bg-brand-blush/80 mx-auto mt-4 rounded-full" />
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="testimonials-grid">
-            {initialTestimonials.map((test) => (
-              <div 
-                key={test.id} 
-                className="bg-brand-sand/20 p-5 rounded-2xl border border-brand-blush/15 text-left flex flex-col justify-between"
-                id={`testimonial-card-${test.id}`}
-              >
-                <div>
-                  {/* Rating Stars block */}
-                  <div className="flex items-center gap-0.5 text-brand-gold mb-3">
-                    {[...Array(test.rating)].map((_, idx) => (
-                      <Star key={idx} size={13} fill="currentColor" />
-                    ))}
-                  </div>
-
-                  <p className="font-sans text-[11px] text-brand-dark/85 leading-relaxed italic mb-5">
-                    &quot;{test.text}&quot;
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3 border-t border-brand-blush/10 pt-4">
-                  <div className="w-8 h-8 rounded-full bg-white overflow-hidden border border-brand-blush/20 shrink-0">
-                    <img src={test.avatarUrl} alt={test.author} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                  </div>
-                  <div>
-                    <h5 className="font-serif text-xs font-bold text-brand-dark leading-tight">{test.author}</h5>
-                    <p className="text-[10px] text-stone-500 font-sans mt-0.5">{test.role}</p>
-                    <span className="inline-block mt-1 font-mono text-[8px] bg-brand-rose/10 text-brand-rose px-1.5 py-0.2 rounded uppercase font-bold">
-                      {test.origin}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-        </div>
-      </section>
 
       {/* ================= SECTION 14 & 15: FAQ AND CONTACT FORM ================= */}
       <section id="contact" className="py-16 lg:py-24 bg-brand-sand/15 scroll-mt-20 border-t border-brand-blush/10">
