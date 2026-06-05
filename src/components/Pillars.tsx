@@ -43,7 +43,7 @@ export default function Pillars({ onFilterCategory }: PillarsProps) {
         </div>
 
         {/* Pillars Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="pillars-container">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="pillars-container">
           {initialPillars.map((pillar) => {
             const icon = iconMap[pillar.iconName] || <Layers size={20} />;
             return (
@@ -81,11 +81,9 @@ export default function Pillars({ onFilterCategory }: PillarsProps) {
                     <button
                       onClick={() => {
                         const catMapped = 
-                          pillar.title === "Skincare Tips" ? "Skincare" :
+                          pillar.title === "Skincare Guide" ? "Skincare" :
                           pillar.title === "Makeup Tutorials" ? "Makeup Tutorial" :
-                          pillar.title === "Beauty Hacks" ? "Beauty Hack" :
-                          pillar.title === "GRWM Content" ? "GRWM" :
-                          pillar.title === "Beauty Transformations" ? "Transformation" : "Product Reviews";
+                          pillar.title === "Beauty Hacks" ? "Beauty Hack" : "GRWM";
                         onFilterCategory(catMapped);
                       }}
                       className="font-mono text-[9px] uppercase tracking-wider text-brand-rose font-bold group-hover:underline cursor-pointer"

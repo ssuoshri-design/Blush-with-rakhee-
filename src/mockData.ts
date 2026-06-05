@@ -24,14 +24,6 @@ export const initialPillars: ContentPillar[] = [
     count: 8,
   },
   {
-    id: "pillar-2",
-    title: "Product Reviews",
-    description: "Unbiased, deeply honest wear-tests and swatch videos of emerging viral makeup and skincare launches. Cruelty-free brand focus.",
-    iconName: "Search",
-    exampleReelTitle: "Honest Pink Blush Swatch Fest",
-    count: 7,
-  },
-  {
     id: "pillar-3",
     title: "Beauty Hacks",
     description: "Smart time-saving shortcuts, budget beauty dupes, and professional application shortcuts that change your daily cosmetic rituals.",
@@ -54,14 +46,6 @@ export const initialPillars: ContentPillar[] = [
     iconName: "Video",
     exampleReelTitle: "Coffee and Soft Glam GRWM",
     count: 3,
-  },
-  {
-    id: "pillar-6",
-    title: "Transformations",
-    description: "Aesthetic, high-impact jump-cut transitions showcasing the artistic power of cosmetic placement and natural feature highlighting.",
-    iconName: "RefreshCw",
-    exampleReelTitle: "Golden Hour Glow Up Transition",
-    count: 2,
   },
 ];
 
@@ -91,18 +75,6 @@ export const initialReels: InstagramReel[] = [
     publishedDate: "2026-05-24",
   },
   {
-    id: "reel-3",
-    title: "Honest Wear Test: Viral Hydrating Tinted Moisturizer",
-    thumbnail: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=600",
-    category: "Product Reviews",
-    views: 15100,
-    likes: 1650,
-    engagementRate: 11.9,
-    instagramUrl: "https://placeholder-instagram.com/reel/3",
-    duration: "1:00",
-    publishedDate: "2026-05-18",
-  },
-  {
     id: "reel-4",
     title: "3 Essential Concealer Placements for Instant Face-Lift",
     thumbnail: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600",
@@ -125,18 +97,6 @@ export const initialReels: InstagramReel[] = [
     instagramUrl: "https://placeholder-instagram.com/reel/5",
     duration: "1:30",
     publishedDate: "2026-05-02",
-  },
-  {
-    id: "reel-6",
-    title: "Dull to Radiant Base: Under 15 Minutes Transformation",
-    thumbnail: "https://images.unsplash.com/photo-1515688594390-b649af70d282?auto=format&fit=crop&q=80&w=600",
-    category: "Transformation",
-    views: 18900,
-    likes: 1910,
-    engagementRate: 10.5,
-    instagramUrl: "https://placeholder-instagram.com/reel/6",
-    duration: "0:50",
-    publishedDate: "2026-04-26",
   },
 ];
 
@@ -310,9 +270,9 @@ export const initialAffiliateProducts: AffiliateItem[] = [
 
 export const initialNewsletterSubscribers: NewsletterSubscriber[] = [
   { id: "sub-1", name: "Ananya Kapoor", email: "ananya@k-style.com", beautyInterests: ["Skincare Tips", "Makeup Tutorials"], dateJoined: "2026-06-03" },
-  { id: "sub-2", name: "Janice Miller", email: "janice.m@gmaildemo.com", beautyInterests: ["Product Reviews", "Beauty Hacks"], dateJoined: "2026-06-01" },
+  { id: "sub-2", name: "Janice Miller", email: "janice.m@gmaildemo.com", beautyInterests: ["Beauty Hacks", "Skincare Tips"], dateJoined: "2026-06-01" },
   { id: "sub-3", name: "Radhika Sengupta", email: "radhika93@outlookmock.com", beautyInterests: ["Makeup Tutorials", "GRWM Content"], dateJoined: "2026-05-28" },
-  { id: "sub-4", name: "Chloe Dupont", email: "chloe.b@beauty-talk.com", beautyInterests: ["Skincare Tips", "Beauty Transformations"], dateJoined: "2026-05-25" },
+  { id: "sub-4", name: "Chloe Dupont", email: "chloe.b@beauty-talk.com", beautyInterests: ["Skincare Tips", "Makeup Tutorials"], dateJoined: "2026-05-25" },
 ];
 
 export const initialFAQs: FAQItem[] = [

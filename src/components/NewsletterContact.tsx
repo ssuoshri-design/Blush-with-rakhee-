@@ -30,7 +30,7 @@ export default function NewsletterContact({
   // Newsletter state
   const [newsName, setNewsName] = useState("");
   const [newsEmail, setNewsEmail] = useState("");
-  const [selectedInterests, setSelectedInterests] = useState<string[]>(["Product Reviews", "Skincare Tips"]);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>(["Skincare Tips", "Makeup Tutorials"]);
   const [newsletterSuccess, setNewsletterSuccess] = useState(false);
 
   // FAQ state
@@ -49,11 +49,9 @@ export default function NewsletterContact({
 
   const interestOptions = [
     "Makeup Tutorials",
-    "Product Reviews",
     "Beauty Hacks",
     "Skincare Tips",
-    "GRWM Content",
-    "Beauty Transformations"
+    "GRWM Content"
   ];
 
   const handleInterestToggle = (interest: string) => {
@@ -224,7 +222,7 @@ export default function NewsletterContact({
                     type="submit"
                     className="w-full bg-brand-dark hover:bg-brand-rose text-white py-3 rounded-full text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
                   >
-                    Subscribe &amp; Get Swatch Guide
+                    Subscribe &amp; Get Glam Guide
                   </button>
                 </form>
               )}

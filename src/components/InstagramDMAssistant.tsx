@@ -10,6 +10,34 @@ interface Message {
   isOptionList?: boolean;
 }
 
+const parseAnswerDetails = (text: string) => {
+  const lower = text.toLowerCase();
+  
+  // Date detection helper
+  const months = /january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec/i;
+  const dateRegex = /\d{1,2}[\/\-\.]\d{1,2}/;
+  const yearRegex = /\b202[6-9]\b/;
+  const hasDate = dateRegex.test(text) || yearRegex.test(text) || months.test(lower) || /today|tomorrow|next week|this weekend|next month/i.test(lower);
+  
+  // Guest count helper: digits or words representing guest count
+  const guestCountRegex = /\b(100|[1-9]\d?)\b/;
+  const hasGuestCount = guestCountRegex.test(text) || /\b(one|two|three|four|five|six|seven|eight|nine|ten|only\s+me|myself|alone|person|people|guest|guests)\b/i.test(lower);
+  
+  // Event type helper: wedding, marriage, etc.
+  const hasEventType = /wedding|bride|bridal|marriage|marrige|engagement|reception|haldi|sangeet|mehendi|photoshoot|shoot|party|anniversary|birthday|corporate|gathering/i.test(lower);
+
+  // Time helper (for party)
+  const hasTime = /\b\d{1,2}\s*(am|pm)\b/i.test(lower) || /\b\d{1,2}:\d{2}\b/.test(text) || /morning|afternoon|evening|night|noon|early|clock|o'clock/i.test(lower);
+
+  // Location helper: we check that they didn't just type a tiny filler/affirmation word, and that there is some substantive text
+  const filler = /^(hi|hello|hey|yes|no|ok|okay|sure|thanks|thank you|fine|pricing|cost|rates|please)$/i.test(lower.trim());
+  
+  const locationKeywords = /hotel|hall|resort|venue|home|house|temple|place|city|address|at\s+[a-zA-Z]+|in\s+[a-zA-Z]+/i.test(lower);
+  const hasLocation = !filler && (locationKeywords || (text.split(/\s+/).length >= 2 && lower.length > 5));
+
+  return { hasDate, hasGuestCount, hasEventType, hasTime, hasLocation };
+};
+
 export default function InstagramDMAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [hasNewMessage, setHasNewMessage] = useState(true);
@@ -57,6 +85,49 @@ export default function InstagramDMAssistant() {
     }
   }, []);
 
+  // Set up custom event listener to handle course inquiries
+  useEffect(() => {
+    const handleCourseInquiry = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const packageName = customEvent.detail?.packageSelected || "Premium Course";
+      setIsOpen(true);
+      setHasNewMessage(false);
+      
+      // Add user message inquiring about this course
+      const userMsgId = "course-user-" + Date.now();
+      const userText = `Hello! I would love to join and book a spot in your: *${packageName}*! 💄🎓`;
+      
+      setMessages(prev => [
+        ...prev.filter(m => m.id !== "welcome-option-list"), // filter out welcome options if any
+        {
+          id: userMsgId,
+          sender: "user",
+          text: userText,
+          timestamp: new Date()
+        }
+      ]);
+
+      setFlowState("general");
+      setIsTyping(true);
+
+      setTimeout(() => {
+        setIsTyping(false);
+        setMessages(prev => [
+          ...prev,
+          {
+            id: "course-reply-" + Date.now(),
+            sender: "assistant",
+            text: `Wonderful choice! You've selected our elite training program: **${packageName}** 🎓✨\n\nTo help us verify availability, reserve your mentorship seat, and set up your orientation call, please share:\n\n📱 **Your WhatsApp Number**\n📅 **Your Preferred Start Date** (or month)\n\nRakhee or our coordinator will reach out to you directly on WhatsApp within 1 hour! 💕`,
+            timestamp: new Date()
+          }
+        ]);
+      }, 1200);
+    };
+
+    window.addEventListener("open-dm-assistant", handleCourseInquiry);
+    return () => window.removeEventListener("open-dm-assistant", handleCourseInquiry);
+  }, []);
+
   const addMessage = (sender: "user" | "assistant", text: string, isOptionList = false) => {
     setMessages(prev => [
       ...prev,
@@ -90,37 +161,40 @@ export default function InstagramDMAssistant() {
 
     switch (optionId) {
       case 1: // Bridal Makeup
+        setLeadDetails({}); // reset state for new flow
         simulateTypingThenReply(
-          "Congratulations on your upcoming event! 💕\n\nTo help us check availability and provide the best package, please share:\n\n📅 Event Date\n📍 Event Location\n💍 Type of Event (Wedding, Engagement, Reception, etc.)\n👤 Number of People Requiring Makeup",
+          "Congratulations on your upcoming wedding! 💍 We would love to be part of your special day.\n\nTo help us check availability, please share your **Event Date** 📅 (e.g., Oct 12th, or 12/11/2026):",
           "bridal_collecting"
         );
         break;
 
       case 2: // Party Makeup
+        setLeadDetails({}); // reset state for new flow
         simulateTypingThenReply(
-          "Wonderful! ✨\n\nPlease share:\n\n📅 Event Date\n📍 Event Location\n⏰ Event Time\n👤 Number of People Requiring Makeup",
+          "We'd love to glam you up! ✨ Let's get a few quick details to check our bookings schedule.\n\nWhat is your **Event Date**? 📅 (e.g., Oct 15th, or 10/15/2026):",
           "party_collecting"
         );
         break;
 
       case 3: // Check Availability
+        setLeadDetails({});
         simulateTypingThenReply(
-          "I'd be happy to check availability ✨\n\nPlease share:\n\n📅 Event Date\n📍 Event Location\n💄 Service Required\n\nThen we will finalize checking my open diary!",
-          "general"
+          "I'd be happy to check availability for you ✨\n\nPlease select either 💍 **Bridal Makeup** or 🎉 **Party Makeup** on the list, or directly share your **Event Date** 📅 to start making your booking inquiry!",
+          "welcome"
         );
         break;
 
       case 4: // Pricing & Packages
         simulateTypingThenReply(
-          "Pricing depends on several factors including:\n\n📅 Event Date\n📍 Location\n💄 Type of Makeup Service\n👤 Number of Clients\n\nPlease share these details and we'll provide the most suitable package options.\n\n*(Please note we do not provide fixed pricing upfront as each makeup package is customized to create the perfect dream look!)*",
-          "general"
+          "Bridal and Party Makeup pricing is fully customized depending on your event date, type of service, venue location, and total guests requiring glams.\n\nTo get your custom bridal packaging quotation, please select **Bridal Makeup** 💍 or **Party Makeup** 🎉 above so we can check availability for your special date!",
+          "welcome"
         );
         break;
 
       case 5: // Portfolio & Previous Work
         simulateTypingThenReply(
-          "You can view our latest makeup transformations, bridal looks, and client results on our Instagram profile and highlights 💕\n\nIf you're interested in a particular style, feel free to share a reference image and we'll be happy to discuss it.",
-          "general"
+          "You can view Rakhee's real client transformations, verified bridal looks, and behind-the-scenes content right here on our interactive website portfolio or head to our main Instagram feed highlights 💕\n\nIf there is a visual style you love, let us know!",
+          "welcome"
         );
         break;
 
@@ -134,7 +208,7 @@ export default function InstagramDMAssistant() {
     setLeadDetails(prev => ({ ...prev, eventType: type }));
     
     simulateTypingThenReply(
-      "Perfect! Next, would you like:\n\n💄 Makeup Only\n💇 Hair Styling + Makeup\n✨ Complete Glam Package",
+      "Perfect! Next, which style of service are you looking for?\n\n💄 Makeup Only\n💇 Hair Styling + Makeup\n✨ Complete Glam Package",
       "party_service_type"
     );
   };
@@ -144,7 +218,7 @@ export default function InstagramDMAssistant() {
     setLeadDetails(prev => ({ ...prev, desiredPackage: service }));
 
     simulateTypingThenReply(
-      "Thank you 💕\n\nPlease share your WhatsApp number so we can confirm availability and provide package details.",
+      "Thank you ✨\n\nOur team will review your details and get back to you shortly with availability and package options.\n\nMay I have your WhatsApp number so we can personal-chat you directly? 📱💕",
       "party_phone"
     );
   };
@@ -163,64 +237,203 @@ export default function InstagramDMAssistant() {
 
     // Flow State: BRIDAL COLLECTING
     if (flowState === "bridal_collecting") {
-      simulateTypingThenReply(
-        "Thank you ✨\n\nOur team will review your details and get back to you shortly with availability and package options.\n\nMay I also have your WhatsApp number for faster communication?",
-        "bridal_phone"
-      );
-      return;
+      const parsed = parseAnswerDetails(userText);
+      const updatedDetails = { ...leadDetails };
+
+      if (!leadDetails.date) {
+        if (parsed.hasDate) {
+          updatedDetails.date = userText;
+          setLeadDetails(updatedDetails);
+          simulateTypingThenReply(
+            "Got it! 📅 What about the **Event Venue or Location**? 📍 (e.g., Hotel Taj Palace, Delhi, or Gurgaon)",
+            "bridal_collecting"
+          );
+        } else {
+          simulateTypingThenReply(
+            "Could you please share a valid Event Date? 📅 (e.g., November 28th, or 11/28/2026 so Rakhee can check her diary schedule!)",
+            "bridal_collecting"
+          );
+        }
+        return;
+      }
+
+      if (!leadDetails.location) {
+        if (parsed.hasLocation) {
+          updatedDetails.location = userText;
+          setLeadDetails(updatedDetails);
+          simulateTypingThenReply(
+            "Perfect! 💍 What **Type of Event** is this for? (e.g., Bridal Wedding, Engagement, Sangeet/Mehndi, or Reception)",
+            "bridal_collecting"
+          );
+        } else {
+          simulateTypingThenReply(
+            "We would love to know where your event venue is! 📍 Please share a valid venue, hotel, or city (e.g., Taj Palace Delhi or Mumbai):",
+            "bridal_collecting"
+          );
+        }
+        return;
+      }
+
+      if (!leadDetails.eventType) {
+        if (parsed.hasEventType) {
+          updatedDetails.eventType = userText;
+          setLeadDetails(updatedDetails);
+          simulateTypingThenReply(
+            "Understood! 👤 How many **people in total require makeup**? (e.g., just the bride, or 4 family members):",
+            "bridal_collecting"
+          );
+        } else {
+          simulateTypingThenReply(
+            "To help us check the proper slot details, is it for your Wedding, Sangeet, Mehndi, or Reception? 💍 Please enter the type of bridal event:",
+            "bridal_collecting"
+          );
+        }
+        return;
+      }
+
+      if (!leadDetails.guestCount) {
+        if (parsed.hasGuestCount) {
+          updatedDetails.guestCount = userText;
+          setLeadDetails(updatedDetails);
+          simulateTypingThenReply(
+            "Thank you ✨\n\nOur team will review your details and get back to you shortly with availability and package options.\n\nMay I also have your WhatsApp number for faster communication? 📱",
+            "bridal_phone"
+          );
+        } else {
+          simulateTypingThenReply(
+            "Please tell us the number of people requiring makeup (or simply reply 'just myself' if it's only for the bride!) 👤:",
+            "bridal_collecting"
+          );
+        }
+        return;
+      }
     }
 
     // Flow State: PARTY COLLECTING
     if (flowState === "party_collecting") {
-      setIsTyping(true);
-      setTimeout(() => {
-        setIsTyping(false);
-        addMessage("assistant", "What type of event is this?", true);
-        setFlowState("party_event_type");
-      }, 1000);
-      return;
+      const parsed = parseAnswerDetails(userText);
+      const updatedDetails = { ...leadDetails };
+
+      if (!leadDetails.date) {
+        if (parsed.hasDate) {
+          updatedDetails.date = userText;
+          setLeadDetails(updatedDetails);
+          simulateTypingThenReply(
+            "Perfect! 📍 What is the **Event Venue or Location**? (e.g., Hyatt Regency, Delhi)",
+            "party_collecting"
+          );
+        } else {
+          simulateTypingThenReply(
+            "Could you please share a valid Event Date? 📅 (e.g., October 15th, or 10/15/2026):",
+            "party_collecting"
+          );
+        }
+        return;
+      }
+
+      if (!leadDetails.location) {
+        if (parsed.hasLocation) {
+          updatedDetails.location = userText;
+          setLeadDetails(updatedDetails);
+          simulateTypingThenReply(
+            "Wonderful! ⏰ What **time of day** is the event? (e.g., 5:00 PM, or Morning prep)",
+            "party_collecting"
+          );
+        } else {
+          simulateTypingThenReply(
+            "Please specify a valid Event Venue or Location 📍 (e.g., Hyatt Hotel or Gurgaon):",
+            "party_collecting"
+          );
+        }
+        return;
+      }
+
+      if (!leadDetails.time) {
+        if (parsed.hasTime) {
+          updatedDetails.time = userText;
+          setLeadDetails(updatedDetails);
+          simulateTypingThenReply(
+            "Great! 👤 How many **people in total require makeup**? (e.g., 1, 3, or just myself)",
+            "party_collecting"
+          );
+        } else {
+          simulateTypingThenReply(
+            "Could you please share a valid Event Time? ⏰ (e.g., 5 PM, or Evening):",
+            "party_collecting"
+          );
+        }
+        return;
+      }
+
+      if (!leadDetails.guestCount) {
+        if (parsed.hasGuestCount) {
+          updatedDetails.guestCount = userText;
+          setLeadDetails(updatedDetails);
+          
+          setIsTyping(true);
+          setTimeout(() => {
+            setIsTyping(false);
+            addMessage("assistant", "What type of event is this? 🎉", true);
+            setFlowState("party_event_type");
+          }, 1000);
+        } else {
+          simulateTypingThenReply(
+            "Please specify the number of guests requiring makeup 👤 (e.g., '1' or 'just me'):",
+            "party_collecting"
+          );
+        }
+        return;
+      }
     }
 
-    // Checking for telephone numbers inside strings to save lead
+    // Checking for telephone numbers inside strings
     const phoneRegex = /(\+?\d[\d\s-]{7,15}\d)/;
     const matchedPhone = userText.match(phoneRegex);
 
-    if ((flowState === "bridal_phone" || flowState === "party_phone" || matchedPhone) && 
-        (lowerText.includes("whatsapp") || lowerText.includes("phone") || matchedPhone || flowState.includes("phone"))) {
-      
-      const num = matchedPhone ? matchedPhone[0] : userText;
-      setLeadDetails(prev => ({ ...prev, whatsapp: num }));
+    if (flowState === "bridal_phone" || flowState === "party_phone") {
+      const isPlainNumber = /^\d{10,13}$/.test(userText.replace(/[\s-().+]/g, ""));
+      if (matchedPhone || isPlainNumber) {
+        const num = matchedPhone ? matchedPhone[0] : userText;
+        setLeadDetails(prev => ({ ...prev, whatsapp: num }));
 
-      simulateTypingThenReply(
-        "Wonderful! Thank you so much 💕 I've saved your phone number, and Rakhee or someone from our team will personal-chat you on WhatsApp very soon to wrap up pricing and book your slot! ✨ Have a beautiful day!",
-        "welcome"
-      );
+        simulateTypingThenReply(
+          "Wonderful! Thank you so much 💕 I've saved your phone number, and Rakhee or someone from our team will personal-chat you on WhatsApp very soon to wrap up pricing and book your slot! ✨ Have a beautiful day!",
+          "welcome"
+        );
+      } else {
+        simulateTypingThenReply(
+          "Please share a valid WhatsApp/phone number (including area code if possible, e.g., +91 XXXXX XXXXX) so our team can personally contact you! 📱💕",
+          flowState
+        );
+      }
       return;
     }
 
     // Keyword detection fallback for natural language input
     if (lowerText.includes("bridal") || lowerText.includes("wedding") || lowerText.includes("bride") || lowerText.includes("marrige") || lowerText.includes("marriage")) {
+      setLeadDetails({}); // reset state for the new flow
       simulateTypingThenReply(
-        "Congratulations on your upcoming event! 💕\n\nTo help us check availability and provide the best package, please share:\n\n📅 Event Date\n📍 Event Location\n💍 Type of Event (Wedding, Engagement, Reception, etc.)\n👤 Number of People Requiring Makeup",
+        "Congratulations on your upcoming wedding! 💍 We would love to be part of your special day.\n\nTo help us check availability, please share your **Event Date** 📅 (e.g., Oct 12th, or 12/11/2026):",
         "bridal_collecting"
       );
     } 
     else if (lowerText.includes("party") || lowerText.includes("makeup for guest") || lowerText.includes("hair styling") || lowerText.includes("reception") || lowerText.includes("engagement")) {
+      setLeadDetails({}); // reset state for the new flow
       simulateTypingThenReply(
-        "Wonderful! ✨\n\nPlease share:\n\n📅 Event Date\n📍 Event Location\n⏰ Event Time\n👤 Number of People Requiring Makeup",
+        "We'd love to glam you up! ✨ Let's get a few quick details to check our bookings schedule.\n\nWhat is your **Event Date**? 📅 (e.g., Oct 15th, or 10/15/2026):",
         "party_collecting"
       );
     } 
     else if (lowerText.includes("price") || lowerText.includes("pricing") || lowerText.includes("packages") || lowerText.includes("rate") || lowerText.includes("how much") || lowerText.includes("cost")) {
       simulateTypingThenReply(
-        "Pricing depends on several factors including:\n\n📅 Event Date\n📍 Location\n💄 Type of Makeup Service\n👤 Number of Clients\n\nPlease share these details and we'll provide the most suitable package options.\n\n*(Please note we do not provide fixed pricing upfront as each glammed look is custom tailored to suit you beautifully!)*",
-        "general"
+        "Pricing is completely customized based on details such as your event date, type of service, location, and guest count.\n\nPlease select **Bridal Makeup** 💍 or **Party Makeup** 🎉 above so we can verify if your date is available and provide a custom quote!",
+        "welcome"
       );
     } 
     else if (lowerText.includes("availability") || lowerText.includes("available") || lowerText.includes("free") || lowerText.includes("book")) {
       simulateTypingThenReply(
-        "I'd be happy to check availability for you ✨\n\nPlease share:\n\n📅 Event Date\n📍 Event Location\n💄 Service Required\n\nAnd I'll check Rakhee's schedule immediately!",
-        "general"
+        "We'd be glad to check availability! 📅 Please select either **Bridal Makeup** 💍 or **Party Makeup** 🎉 from our main options menu to specify your target date.",
+        "welcome"
       );
     } 
     else if (lowerText.includes("portfolio") || lowerText.includes("work") || lowerText.includes("gallery") || lowerText.includes("photo") || lowerText.includes("transformation")) {

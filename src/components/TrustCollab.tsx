@@ -135,106 +135,14 @@ export default function TrustCollab({ onSelectService }: TrustCollabProps) {
           </h2>
           
           <p className="font-sans text-stone-600 mt-5 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
-            From honest beauty reviews to stunning makeup transformations, Rakhee has built a community that values authenticity, expertise, and results.
+            From luxury wedding glams to exquisite party makeup, Rakhee has built a trusted reputation as a leading makeup artist who values authenticity, elegant techniques, and personalized results.
           </p>
           <div className="w-16 h-1 bg-brand-rose/60 mx-auto mt-6 rounded-full" />
         </div>
 
-        {/* ================= 3-COLUMN LUXURY EDITORIAL GRID ================= */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 mb-20" id="trust-editorial-grid">
+        {/* ================= 2-COLUMN LUXURY EDITORIAL GRID ================= */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-20 max-w-5xl mx-auto" id="trust-editorial-grid">
           
-          {/* CARD 1: Real Makeup Transformations */}
-          <div 
-            className="bg-white/80 backdrop-blur-md rounded-3xl overflow-hidden border border-brand-blush/20 group hover:shadow-2xl transition-all duration-300 flex flex-col justify-between"
-            id="ed-card-transformations"
-          >
-            <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between text-left">
-              <div>
-                <span className="font-mono text-[10px] text-brand-rose uppercase tracking-[0.2em] font-bold block mb-2">
-                  BEFORE &amp; AFTER SLIDER
-                </span>
-                <h3 className="font-serif text-lg sm:text-xl text-brand-dark font-semibold mb-3 flex items-center gap-2">
-                  💄 Real Makeup Transformations
-                </h3>
-                <p className="font-sans text-xs sm:text-sm text-stone-600 leading-relaxed mb-6">
-                  See how clients transform for weddings, engagements, parties, and special occasions with Rakhee's signature makeup artistry.
-                </p>
-              </div>
-
-              {/* High-fidelity interactive split visual */}
-              <div 
-                className="relative h-64 w-full rounded-2xl overflow-hidden shadow-inner select-none cursor-ew-resize border border-stone-100"
-                onMouseMove={(e) => {
-                  if (e.buttons === 1 || isSliding) {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const x = ((e.clientX - rect.left) / rect.width) * 100;
-                    setSliderPosition(Math.max(0, Math.min(100, x)));
-                  }
-                }}
-                onTouchMove={(e) => {
-                  if (e.touches[0]) {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const x = ((e.touches[0].clientX - rect.left) / rect.width) * 100;
-                    setSliderPosition(Math.max(0, Math.min(100, x)));
-                  }
-                }}
-                onMouseDown={() => setIsSliding(true)}
-                onMouseUp={() => setIsSliding(false)}
-                onTouchStart={() => setIsSliding(true)}
-                onTouchEnd={() => setIsSliding(false)}
-              >
-                {/* AFTER image */}
-                <img 
-                  src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600" 
-                  alt="After makeup bridal glow" 
-                  className="absolute inset-0 w-full h-full object-cover" 
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute right-3 bottom-3 bg-brand-rose/90 backdrop-blur-md text-white text-[9px] font-mono font-bold tracking-widest px-2 py-0.5 rounded">
-                  GLAMMED AFTER
-                </div>
-
-                {/* BEFORE image */}
-                <div 
-                  className="absolute inset-y-0 left-0 overflow-hidden"
-                  style={{ width: `${sliderPosition}%` }}
-                >
-                  <img 
-                    src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&q=80&w=600" 
-                    alt="Before makeup natural skin prep" 
-                    className="absolute inset-y-0 left-0 h-full w-full object-cover max-w-none"
-                    style={{ width: "100%" }}
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute left-3 bottom-3 bg-[#2D2D2D]/90 backdrop-blur-md text-white text-[9px] font-mono font-bold tracking-widest px-2 py-0.5 rounded">
-                    RAW SKIN PREP
-                  </div>
-                </div>
-
-                {/* Interactive Slider line handle */}
-                <div 
-                  className="absolute inset-y-0 w-0.5 bg-white flex items-center justify-center cursor-ew-resize shadow-md"
-                  style={{ left: `${sliderPosition}%` }}
-                >
-                  <div className="w-6 h-6 rounded-full bg-white text-brand-rose flex items-center justify-center shadow-lg border border-brand-blush text-[10px] font-bold select-none">
-                    ↔
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-5 bg-[#FCF8F6] border-t border-brand-blush/10 flex items-center justify-between">
-              <span className="text-[10px] text-stone-500 font-sans">Slide to view result match</span>
-              <button 
-                onClick={() => scrollToSection("brand-collab-testimonials")}
-                className="text-xs font-bold text-brand-rose hover:text-brand-dark transition-colors inline-flex items-center gap-1 cursor-pointer"
-              >
-                <span>View Transformations</span>
-                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-              </button>
-            </div>
-          </div>
-
           {/* CARD 2: Happy Clients */}
           <div 
             className="bg-white/80 backdrop-blur-md rounded-3xl overflow-hidden border border-brand-blush/20 group hover:shadow-2xl transition-all duration-300 flex flex-col justify-between"
