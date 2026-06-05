@@ -15,12 +15,12 @@ export default function About() {
     {
       icon: <Zap size={16} className="text-brand-rose" />,
       title: "100% Reels Native",
-      text: "Highly paced, zoom-locked, sound-synchronized editing ensuring high-retention video content designed for modern mobile feeds."
+      text: "Creating engaging reels with natural pacing, honest swatches, and clear closeups tailored specifically for beauty enthusiasts."
     },
     {
       icon: <FileSpreadsheet size={16} className="text-brand-rose" />,
-      title: "Analytical Excellence",
-      text: "Providing brands with complete backend statistics, accurate UTM tracking parameters, and structured campaign reporting."
+      title: "Transparent & Professional",
+      text: "Providing brands with reliable, honest reviews and professional communication to build long-term, trusted collaborations."
     }
   ];
 
@@ -79,11 +79,11 @@ export default function About() {
             </h3>
 
             <p className="font-sans text-sm text-brand-dark/85 leading-relaxed">
-              I launched **Blush With Rakhee** as a dedicated voice in the beauty space. Realizing that the modern beauty ecosystem is saturated with extreme airbrushing and promotional noise, I set out to create a trusted repository of honest reviews and relatable tutorials.
+              I launched **Blush With Rakhee** as a dedicated, welcoming space in the beauty community. Realizing that many beauty reviews are heavily filtered or feel out of reach, I set out to share real, everyday makeup tips and honest skincare experiences that anyone can try.
             </p>
 
             <p className="font-sans text-sm text-brand-dark/85 leading-relaxed">
-              With **100% video-based content** on Instagram, I specialize in teaching women how to integrate both high-end luxury products and accessible drugstore alternatives. Every Reel I publish is synthesized with sound trends, designed for crisp visual pacing, and packed with practical takeaway wisdom.
+              With **100% video-based content** on Instagram, I focus on helping women find both high-end premium cosmetics and accessible drugstore alternatives. Every Reel I publish features real skin texture, step-by-step techniques, and friendly advice that empowers my community to feel their best.
             </p>
 
             {/* Exclusive Quote Box */}
@@ -93,7 +93,7 @@ export default function About() {
                 My Core Mission
               </p>
               <p className="font-serif text-sm lg:text-base text-brand-dark italic leading-relaxed">
-                To build an unfiltered haven of beauty literacy—equipping women with the self-confidence, skin prep knowledge, and color-swatched accuracy required to make smart, waste-free cosmetic decisions.
+                To offer honest, authentic, and realistic beauty content—helping women build self-confidence, understand their skin, and find products that genuinely work for their daily lives.
               </p>
             </div>
 

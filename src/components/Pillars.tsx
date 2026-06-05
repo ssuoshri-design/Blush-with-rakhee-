@@ -31,13 +31,13 @@ export default function Pillars({ onFilterCategory }: PillarsProps) {
         {/* Header Block */}
         <div className="text-center max-w-2xl mx-auto mb-16" id="pillars-title-block">
           <span className="font-mono text-xs text-brand-rose uppercase tracking-[0.25em] font-bold block mb-2">
-            DESIGNED FOR ENGAGEMENT
+            HOW I CONNECT WITH AUDIENCES
           </span>
           <h2 className="font-serif text-3xl lg:text-4xl text-brand-dark font-semibold">
             Beauty Content Pillars
           </h2>
           <p className="font-sans text-xs sm:text-sm text-brand-dark/70 mt-3 max-w-lg mx-auto">
-            These six focal areas structure all visual outputs, engineered specifically to trigger viral saves, shares, and high comments-to-sales ratios.
+            These six focal areas guide my beauty content, allowing me to share practical value and build genuine, trusted connections with key viewers.
           </p>
           <div className="w-12 h-1 bg-brand-blush/80 mx-auto mt-4 rounded-full" />
         </div>

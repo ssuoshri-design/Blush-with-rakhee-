@@ -1,251 +1,471 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import { 
-  HeartHandshake, ShieldCheck, Stars, BookOpen, Users2, Layers, 
-  Video, Sparkles, ShoppingBag, Radio, Milestone, ArrowRight, DollarSign 
-} from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion } from "motion/react";
+import { Sparkles, Star, ArrowRight } from "lucide-react";
 
 interface TrustCollabProps {
   onSelectService: (serviceName: string) => void;
 }
 
 export default function TrustCollab({ onSelectService }: TrustCollabProps) {
-  // Section 6 Points
-  const trustPoints = [
-    {
-      icon: <ShieldCheck className="text-brand-rose" size={20} />,
-      title: "Authentic Swatching",
-      desc: "Every product swatch is filmed under standard daylight and studio bulb rings. Highlighting natural skin pores, textures, and neutral color tones without falsified camera filters."
-    },
-    {
-      icon: <HeartHandshake className="text-brand-rose" size={20} />,
-      desc: "If a formula creases, pills, or underperforms during our 8-hour wear test, we describe exactly why and who the product actually suits, retaining absolute follower trust.",
-      title: "Honest Diagnostics"
-    },
-    {
-      icon: <Stars className="text-brand-rose" size={20} />,
-      desc: "Prioritizing cosmetic chemistry basics, skin barrier prep, and accurate structural blending tips instead of temporary trends. Giving long-term confidence to the viewer.",
-      title: "Actionable Knowledge"
-    },
-    {
-      icon: <Users2 className="text-brand-rose" size={20} />,
-      desc: "Promptly engaging with comments and swifty responding to product inquiries, creating an active and intimate micro-hub of organic beauty consumers.",
-      title: "Deeply Nested Community"
-    },
+  // Before-After Slider State
+  const [sliderPosition, setSliderPosition] = useState(50);
+  const [isSliding, setIsSliding] = useState(false);
+
+  // Active Brand Carousel index
+  const [brandIndex, setBrandIndex] = useState(0);
+
+  // Stats state for premium animated counters
+  const [stats, setStats] = useState({
+    lovers: 0,
+    reach: 0.0,
+    sessions: 0,
+    collabs: 0
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+    const duration = 1600;
+    const steps = 60;
+    const stepTime = duration / steps;
+    let currentStep = 0;
+
+    const timer = setInterval(() => {
+      currentStep++;
+      const progress = Math.min(currentStep / steps, 1);
+      const easeProgress = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+
+      if (isMounted) {
+        setStats({
+          lovers: Math.min(Math.floor(easeProgress * 50), 50),
+          reach: Number((easeProgress * 2.0).toFixed(1)),
+          sessions: Math.min(Math.floor(easeProgress * 500), 500),
+          collabs: Math.min(Math.floor(easeProgress * 100), 100)
+        });
+      }
+
+      if (currentStep >= steps) {
+        clearInterval(timer);
+      }
+    }, stepTime);
+
+    return () => {
+      isMounted = false;
+      clearInterval(timer);
+    };
+  }, []);
+
+  const partnerBrands = [
+    { name: "MAC Cosmetics" },
+    { name: "Estée Lauder" },
+    { name: "Rare Beauty" },
+    { name: "Sephora" },
+    { name: "Aurora Skin" },
+    { name: "Glossier" }
   ];
 
-  // Section 7 Services
-  const services = [
+  // Brand index rotational timer
+  useEffect(() => {
+    const brandTimer = setInterval(() => {
+      setBrandIndex((prev) => (prev + 1) % partnerBrands.length);
+    }, 3000);
+    return () => clearInterval(brandTimer);
+  }, []);
+
+  const testimonials = [
     {
-      id: "ugc",
-      icon: <Video size={18} className="text-brand-rose" />,
-      title: "UGC Content Creation",
-      desc: "Create authentic, creator-style videos that feel natural, engaging, and relatable.",
-      deliverables: "Product demonstrations • Beauty tutorials • Product application videos • Lifestyle beauty content • Short-form vertical videos. Perfect For: Social media advertising, product launches, and brand awareness campaigns.",
-      badge: "UGC Content"
+      id: "testi-1",
+      name: "Ananya Sharma",
+      role: "Bridal Client",
+      feedback: "Rakhee is an absolute magician! She did my bridal makeup and I felt so elegant and confident. The glow stayed intact all night without feeling heavy. She listened to every single detail I requested!",
+      rating: 5,
+      image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150",
+      tag: "Wedding Look"
     },
     {
-      id: "reels",
-      icon: <Sparkles size={18} className="text-brand-rose" />,
-      title: "Sponsored Instagram Reels",
-      desc: "Feature your product naturally within beauty tutorials, GRWM videos, product reviews, or transformation content.",
-      deliverables: "1 Instagram Reel • Product tagging • Brand mention • Optional story support",
-      badge: "Sponsored Post"
+      id: "testi-2",
+      name: "Priya Patel",
+      role: "Special Occasion Client",
+      feedback: "Honestly, the best party makeup experience ever! Rakhee has this beautiful way of enhancing your natural features without making you look caked. I got hundreds of compliments on my dewy reception glow!",
+      rating: 5,
+      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150",
+      tag: "Reception Glow"
     },
     {
-      id: "reviews",
-      icon: <ShoppingBag size={18} className="text-brand-rose" />,
-      title: "Honest Product Reviews",
-      desc: "Share genuine experiences with products while maintaining transparency and audience trust.",
-      deliverables: "Review Reel • Product demonstration • Beauty-focused feedback • Optional story coverage",
-      badge: "Product Review"
-    },
-    {
-      id: "affiliate",
-      icon: <Radio size={18} className="text-brand-rose" />,
-      title: "Affiliate Partnerships",
-      desc: "For brands interested in long-term collaboration opportunities, affiliate partnerships allow product recommendations to be shared through trusted content and authentic experiences.",
-      deliverables: "Affiliate content integration • Product recommendations • Long-term promotional opportunities",
-      badge: "Affiliate Collaboration"
-    },
-    {
-      id: "ambassador",
-      icon: <Milestone size={18} className="text-brand-rose" />,
-      title: "Long-Term Brand Partnerships",
-      desc: "Build consistent visibility through recurring collaborations and ongoing content integration.",
-      deliverables: "Beauty Brands • Skincare Companies • Cosmetics Launches • Product Campaigns",
-      badge: "Brand Ambassadorship"
+      id: "testi-3",
+      name: "Shalini Sen",
+      role: "Beauty Content Creator",
+      feedback: "As a product reviewer myself, I’m extremely particular. Rakhee's recommendations are so honest and her makeup techniques are flawless. Her ability to blend drugstore hacks with luxury brands is unmatched.",
+      rating: 5,
+      image: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&q=80&w=150",
+      tag: "Coached Session"
     }
   ];
 
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    element?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
-    <section id="collaborations" className="py-16 lg:py-24 bg-brand-sand/15 relative overflow-hidden">
+    <section id="why-trust-rakhee" className="py-20 lg:py-28 bg-[#FCF5F3] relative overflow-hidden">
       
-      {/* Decorative gradient stripes */}
-      <div className="absolute right-0 top-1/4 w-96 h-96 rounded-full bg-brand-blush/20 blur-3xl" />
-      <div className="absolute left-10 bottom-10 w-80 h-80 rounded-full bg-brand-sand/60 blur-3xl" />
+      {/* Luxury Background Gradients */}
+      <div className="absolute top-10 left-10 w-[500px] h-[500px] rounded-full bg-brand-blush/20 blur-3xl pointer-events-none" />
+      <div className="absolute right-0 bottom-20 w-[450px] h-[450px] rounded-full bg-brand-sand/50 blur-3xl pointer-events-none" />
+      
+      <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-brand-blush/5 via-brand-blush/20 to-transparent hidden lg:block" />
+      <div className="absolute top-0 right-1/4 w-px h-full bg-gradient-to-b from-brand-blush/5 via-brand-blush/20 to-transparent hidden lg:block" />
 
       <div className="max-w-7xl mx-auto px-4 lg:px-8 relative z-10">
         
-        {/* ================= SECTION 6: WHY PEOPLE TRUST RAKHEE ================= */}
-        <div className="mb-24">
-          <div className="text-center max-w-2xl mx-auto mb-16" id="trust-header">
-            <span className="font-mono text-xs text-brand-rose uppercase tracking-[0.25em] font-bold block mb-2">
-              THE VALUE OF AUTHENTICITY
-            </span>
-            <h2 className="font-serif text-3xl lg:text-4xl text-brand-dark font-semibold">
-              Why Brands &amp; Followers Trust Rakhee
-            </h2>
-            <div className="w-12 h-1 bg-brand-blush/80 mx-auto mt-4 rounded-full" />
+        {/* ================= HEADER SECTION ================= */}
+        <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-24" id="trust-header">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-2 px-3 py-1 bg-brand-rose/10 text-brand-rose rounded-full text-xs font-mono tracking-widest uppercase font-bold mb-4"
+          >
+            <Sparkles size={12} className="animate-pulse" /> Why Thousands Trust Rakhee
+          </motion.div>
+          
+          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-brand-dark font-medium tracking-tight leading-tight">
+            Real Beauty. Real Results. Real Trust.
+          </h2>
+          
+          <p className="font-sans text-stone-600 mt-5 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
+            From honest beauty reviews to stunning makeup transformations, Rakhee has built a community that values authenticity, expertise, and results.
+          </p>
+          <div className="w-16 h-1 bg-brand-rose/60 mx-auto mt-6 rounded-full" />
+        </div>
+
+        {/* ================= 3-COLUMN LUXURY EDITORIAL GRID ================= */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 mb-20" id="trust-editorial-grid">
+          
+          {/* CARD 1: Real Makeup Transformations */}
+          <div 
+            className="bg-white/80 backdrop-blur-md rounded-3xl overflow-hidden border border-brand-blush/20 group hover:shadow-2xl transition-all duration-300 flex flex-col justify-between"
+            id="ed-card-transformations"
+          >
+            <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between text-left">
+              <div>
+                <span className="font-mono text-[10px] text-brand-rose uppercase tracking-[0.2em] font-bold block mb-2">
+                  BEFORE &amp; AFTER SLIDER
+                </span>
+                <h3 className="font-serif text-lg sm:text-xl text-brand-dark font-semibold mb-3 flex items-center gap-2">
+                  💄 Real Makeup Transformations
+                </h3>
+                <p className="font-sans text-xs sm:text-sm text-stone-600 leading-relaxed mb-6">
+                  See how clients transform for weddings, engagements, parties, and special occasions with Rakhee's signature makeup artistry.
+                </p>
+              </div>
+
+              {/* High-fidelity interactive split visual */}
+              <div 
+                className="relative h-64 w-full rounded-2xl overflow-hidden shadow-inner select-none cursor-ew-resize border border-stone-100"
+                onMouseMove={(e) => {
+                  if (e.buttons === 1 || isSliding) {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    setSliderPosition(Math.max(0, Math.min(100, x)));
+                  }
+                }}
+                onTouchMove={(e) => {
+                  if (e.touches[0]) {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const x = ((e.touches[0].clientX - rect.left) / rect.width) * 100;
+                    setSliderPosition(Math.max(0, Math.min(100, x)));
+                  }
+                }}
+                onMouseDown={() => setIsSliding(true)}
+                onMouseUp={() => setIsSliding(false)}
+                onTouchStart={() => setIsSliding(true)}
+                onTouchEnd={() => setIsSliding(false)}
+              >
+                {/* AFTER image */}
+                <img 
+                  src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600" 
+                  alt="After makeup bridal glow" 
+                  className="absolute inset-0 w-full h-full object-cover" 
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute right-3 bottom-3 bg-brand-rose/90 backdrop-blur-md text-white text-[9px] font-mono font-bold tracking-widest px-2 py-0.5 rounded">
+                  GLAMMED AFTER
+                </div>
+
+                {/* BEFORE image */}
+                <div 
+                  className="absolute inset-y-0 left-0 overflow-hidden"
+                  style={{ width: `${sliderPosition}%` }}
+                >
+                  <img 
+                    src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&q=80&w=600" 
+                    alt="Before makeup natural skin prep" 
+                    className="absolute inset-y-0 left-0 h-full w-full object-cover max-w-none"
+                    style={{ width: "100%" }}
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute left-3 bottom-3 bg-[#2D2D2D]/90 backdrop-blur-md text-white text-[9px] font-mono font-bold tracking-widest px-2 py-0.5 rounded">
+                    RAW SKIN PREP
+                  </div>
+                </div>
+
+                {/* Interactive Slider line handle */}
+                <div 
+                  className="absolute inset-y-0 w-0.5 bg-white flex items-center justify-center cursor-ew-resize shadow-md"
+                  style={{ left: `${sliderPosition}%` }}
+                >
+                  <div className="w-6 h-6 rounded-full bg-white text-brand-rose flex items-center justify-center shadow-lg border border-brand-blush text-[10px] font-bold select-none">
+                    ↔
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-5 bg-[#FCF8F6] border-t border-brand-blush/10 flex items-center justify-between">
+              <span className="text-[10px] text-stone-500 font-sans">Slide to view result match</span>
+              <button 
+                onClick={() => scrollToSection("brand-collab-testimonials")}
+                className="text-xs font-bold text-brand-rose hover:text-brand-dark transition-colors inline-flex items-center gap-1 cursor-pointer"
+              >
+                <span>View Transformations</span>
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="trust-cards-grid">
-            {trustPoints.map((pt, i) => (
-              <div 
-                key={i} 
-                className="bg-white p-6 rounded-2xl border border-brand-blush/20 hover:border-brand-rose hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 text-left flex flex-col justify-between"
-                id={`trust-card-${i}`}
+          {/* CARD 2: Happy Clients */}
+          <div 
+            className="bg-white/80 backdrop-blur-md rounded-3xl overflow-hidden border border-brand-blush/20 group hover:shadow-2xl transition-all duration-300 flex flex-col justify-between"
+            id="ed-card-clients"
+          >
+            <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between text-left">
+              <div>
+                <span className="font-mono text-[10px] text-brand-rose uppercase tracking-[0.2em] font-bold block mb-2">
+                  100% SATISFACTION RATIO
+                </span>
+                <h3 className="font-serif text-lg sm:text-xl text-brand-dark font-semibold mb-3 flex items-center gap-2">
+                  ❤️ Happy Clients
+                </h3>
+                <p className="font-sans text-xs sm:text-sm text-stone-600 leading-relaxed mb-6">
+                  Trusted by brides, professionals, creators, and beauty enthusiasts who love looking and feeling their best.
+                </p>
+              </div>
+
+              {/* Client Visual Display Block */}
+              <div className="relative h-64 w-full rounded-2xl bg-gradient-to-br from-brand-sand/40 to-brand-blush/15 p-4 overflow-hidden border border-brand-blush/10 flex flex-col justify-center space-y-3">
+                <div className="bg-white/95 backdrop-blur-md p-3.5 rounded-2xl shadow-sm text-left max-w-[95%] transform -rotate-1 relative">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <img 
+                      src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150" 
+                      alt="Ananya Sharma" 
+                      className="w-6 h-6 rounded-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div>
+                      <h4 className="text-[10px] font-bold text-stone-800">Ananya Sharma (Bride)</h4>
+                      <div className="flex text-yellow-500 text-[8px]">
+                        <Star size={8} fill="currentColor" className="stroke-none" />
+                        <Star size={8} fill="currentColor" className="stroke-none" />
+                        <Star size={8} fill="currentColor" className="stroke-none" />
+                        <Star size={8} fill="currentColor" className="stroke-none" />
+                        <Star size={8} fill="currentColor" className="stroke-none" />
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-[9px] text-stone-600 italic">"Rakhee made me feel like royalty! Best wedding glam..."</p>
+                </div>
+
+                <div className="bg-[#2D2D2D]/95 backdrop-blur-md p-3.5 rounded-2xl shadow-sm text-left max-w-[95%] self-end transform rotate-1 text-white">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <img 
+                      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" 
+                      alt="Priya Patel" 
+                      className="w-6 h-6 rounded-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div>
+                      <h4 className="text-[10px] font-bold text-white">Priya Patel (Party Guest)</h4>
+                      <div className="flex text-yellow-500 text-[8px]">
+                        <Star size={8} fill="currentColor" className="stroke-none" />
+                        <Star size={8} fill="currentColor" className="stroke-none" />
+                        <Star size={8} fill="currentColor" className="stroke-none" />
+                        <Star size={8} fill="currentColor" className="stroke-none" />
+                        <Star size={8} fill="currentColor" className="stroke-none" />
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-[9px] text-white/90 italic">"The dewy reception makeup stayed flawless all night long."</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-5 bg-[#FCF8F6] border-t border-brand-blush/10 flex items-center justify-between">
+              <span className="text-[10px] text-stone-500 font-sans">Read full community testimonials</span>
+              <button 
+                onClick={() => scrollToSection("brand-collab-testimonials")}
+                className="text-xs font-bold text-brand-rose hover:text-brand-dark transition-colors inline-flex items-center gap-1 cursor-pointer"
+              >
+                <span>Read Reviews</span>
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+          </div>
+
+          {/* CARD 3: Brand Collaborations */}
+          <div 
+            className="bg-white/80 backdrop-blur-md rounded-3xl overflow-hidden border border-brand-blush/20 group hover:shadow-2xl transition-all duration-300 flex flex-col justify-between"
+            id="ed-card-collabs"
+          >
+            <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between text-left">
+              <div>
+                <span className="font-mono text-[10px] text-brand-rose uppercase tracking-[0.2em] font-bold block mb-2">
+                  TRUSTED BRAND NETWORK
+                </span>
+                <h3 className="font-serif text-lg sm:text-xl text-brand-dark font-semibold mb-3 flex items-center gap-2">
+                  🤝 Brand Collaborations
+                </h3>
+                <p className="font-sans text-xs sm:text-sm text-stone-600 leading-relaxed mb-6">
+                  Partnering with beauty brands that genuinely deliver value to the audience.
+                </p>
+              </div>
+
+              {/* Logo Carousel Container */}
+              <div className="relative h-64 w-full rounded-2xl bg-white border border-stone-100 flex items-center justify-center overflow-hidden">
+                <div className="text-center w-full px-4">
+                  <p className="text-[9px] text-stone-400 font-mono tracking-widest uppercase mb-4">Official Product Collaborations</p>
+                  
+                  <div className="flex flex-wrap items-center justify-center gap-2.5">
+                    {partnerBrands.map((brand, i) => (
+                      <span 
+                        key={i} 
+                        className={`px-3 py-1.5 border rounded-xl text-[10px] font-mono font-extrabold ${
+                          brandIndex === i 
+                            ? 'bg-brand-rose text-white border-brand-rose scale-105 shadow-md shadow-brand-rose/25' 
+                            : 'bg-white text-stone-500 border-stone-100'
+                        } transition-all duration-300`}
+                      >
+                        {brand.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-5 bg-[#FCF8F6] border-t border-brand-blush/10 flex items-center justify-between">
+              <span className="text-[10px] text-stone-500 font-sans">Trusted by global beauty partners</span>
+              <button 
+                onClick={() => onSelectService("UGC Content Creation")}
+                className="text-xs font-bold text-brand-rose hover:text-brand-dark transition-colors inline-flex items-center gap-1 cursor-pointer"
+              >
+                <span>See Collaborations</span>
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        {/* ================= ANIMATED STATS BAR ================= */}
+        <div className="bg-[#2D2D2D] text-white rounded-[2.5rem] py-12 px-6 sm:px-12 grid grid-cols-2 lg:grid-cols-4 gap-8 text-center shadow-2xl relative overflow-hidden mb-24 border border-white/5" id="animated-stats-block">
+          
+          <div className="absolute right-0 bottom-0 w-64 h-64 bg-brand-rose/10 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="space-y-1">
+            <h4 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white flex items-center justify-center">
+              <span>{stats.lovers}</span>K+
+            </h4>
+            <p className="text-[10px] sm:text-xs font-sans tracking-widest text-[#E8C8C8] uppercase font-semibold">
+              Beauty Lovers
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            <h4 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white flex items-center justify-center">
+              <span>{stats.reach}</span>M+
+            </h4>
+            <p className="text-[10px] sm:text-xs font-sans tracking-widest text-[#E8C8C8] uppercase font-semibold">
+              Monthly Reach
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            <h4 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white flex items-center justify-center">
+              <span>{stats.sessions}</span>+
+            </h4>
+            <p className="text-[10px] sm:text-xs font-sans tracking-widest text-[#E8C8C8] uppercase font-semibold">
+              Makeup Sessions
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            <h4 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white flex items-center justify-center">
+              <span>{stats.collabs}</span>+
+            </h4>
+            <p className="text-[10px] sm:text-xs font-sans tracking-widest text-[#E8C8C8] uppercase font-semibold">
+              Brand Collabs
+            </p>
+          </div>
+
+        </div>
+
+        {/* ================= TESTIMONIAL CARDS (FULL WIDTH DECK) ================= */}
+        <div className="scroll-mt-20" id="brand-collab-testimonials">
+          <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+            <span className="font-mono text-xs text-brand-rose uppercase tracking-[0.25em] font-bold block mb-2">
+              REAL TESTIMONIALS
+            </span>
+            <h2 className="font-serif text-3xl lg:text-4xl text-brand-dark font-medium leading-tight">
+              What People Say About Rakhee
+            </h2>
+            <div className="w-12 h-1 bg-brand-rose/60 mx-auto mt-4 rounded-full" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testi) => (
+              <div
+                key={testi.id}
+                className="bg-white p-7 rounded-3xl border border-brand-blush/25 hover:border-brand-rose/60 transition-all duration-300 shadow-sm hover:shadow-xl text-left flex flex-col justify-between hover:-translate-y-1"
               >
                 <div>
-                  <div className="w-10 h-10 rounded-xl bg-brand-sand/65 flex items-center justify-center mb-4 text-brand-rose">
-                    {pt.icon}
+                  <div className="flex text-yellow-500 mb-4 gap-0.5">
+                    {[...Array(testi.rating)].map((_, idx) => (
+                      <Star key={idx} size={14} fill="currentColor" className="stroke-none" />
+                    ))}
                   </div>
-                  <h3 className="font-serif text-base font-bold text-brand-dark mb-2">
-                    {pt.title}
-                  </h3>
-                  <p className="font-sans text-[11px] text-brand-dark/75 leading-relaxed">
-                    {pt.desc}
+
+                  <p className="font-sans text-xs sm:text-sm text-stone-600 italic leading-relaxed mb-6 text-left">
+                    "{testi.feedback}"
                   </p>
                 </div>
-                <div className="mt-4 pt-3 border-t border-brand-blush/10 text-[9px] font-mono uppercase tracking-widest text-brand-rose font-bold">
-                  Guaranteed Standard
+
+                <div className="flex items-center gap-3 pt-4 border-t border-stone-100">
+                  <div className="relative">
+                    <img 
+                      src={testi.image} 
+                      alt={testi.name} 
+                      className="w-10 h-10 rounded-full object-cover border border-brand-blush"
+                      referrerPolicy="no-referrer"
+                    />
+                    <span className="absolute -bottom-1 -right-1 bg-brand-rose text-white p-0.5 rounded-full text-[6px]">💖</span>
+                  </div>
+                  <div className="text-left">
+                    <h4 className="font-serif text-sm font-bold text-brand-dark">{testi.name}</h4>
+                    <p className="text-[10px] text-stone-400 font-mono tracking-wider">{testi.role}</p>
+                  </div>
+                  <span className="ml-auto bg-brand-sand/70 text-brand-rose font-mono text-[8px] uppercase tracking-wider px-2 py-0.5 rounded font-bold">
+                    {testi.tag}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* ================= SECTION 7: BRAND COLLABORATION HUB ================= */}
-        <div>
-          <div className="text-center max-w-2xl mx-auto mb-16" id="collab-header">
-            <span className="font-mono text-xs text-brand-rose uppercase tracking-[0.25em] font-bold block mb-2">
-              BRAND COLLABORATIONS
-            </span>
-            <h2 className="font-serif text-3xl lg:text-4xl text-brand-dark font-semibold">
-              Let&apos;s Create Something Beautiful Together
-            </h2>
-            <p className="font-sans text-xs sm:text-sm text-brand-dark/70 mt-3">
-              I love discovering products that genuinely add value to my audience. Whether you&apos;re launching a new beauty product, looking for authentic creator content, or looking for a long-term partnership, I&apos;d love to explore how we can work together.
-            </p>
-            <div className="w-12 h-1 bg-brand-blush/80 mx-auto mt-4 rounded-full" />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start" id="collab-hub-content">
-            {/* Left services list */}
-            <div className="lg:col-span-8 space-y-4" id="services-grid">
-              {services.map((srv) => (
-                <div 
-                  key={srv.id}
-                  className="bg-white p-5 rounded-2xl border border-brand-blush/20 hover:border-brand-rose/60 transition-all duration-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-left group hover:shadow-md"
-                >
-                  <div className="flex items-start gap-4 flex-1">
-                    <div className="w-12 h-12 rounded-xl bg-brand-sand border border-brand-blush/20 flex items-center justify-center shrink-0">
-                      {srv.icon}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-serif text-base font-bold text-brand-dark group-hover:text-brand-rose transition-colors">
-                          {srv.title}
-                        </h3>
-                        <span className="bg-brand-rose/10 text-brand-rose font-mono text-[8px] uppercase tracking-wider px-2 py-0.5 rounded font-bold">
-                          {srv.badge}
-                        </span>
-                      </div>
-                      <p className="font-sans text-xs text-brand-dark/75 mt-1 leading-relaxed max-w-xl">
-                        {srv.desc}
-                      </p>
-                      <p className="font-sans text-[11px] text-brand-rose font-medium mt-2">
-                        <strong>Standard Deliverables:</strong> {srv.deliverables}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="shrink-0 w-full sm:w-auto self-end sm:self-center">
-                    <button
-                      onClick={() => onSelectService(srv.title)}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-1 bg-brand-rose hover:bg-brand-dark text-white px-4 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer group-hover:scale-102"
-                    >
-                      <span>Select</span>
-                      <ArrowRight size={12} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Right micro media kit cards / Trust indicator */}
-            <div className="lg:col-span-4 space-y-6" id="collab-sidebar">
-              <div className="bg-brand-dark text-white p-6 rounded-3xl text-left border border-white/5 shadow-xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-blush/10 rounded-full blur-2xl" />
-                
-                <h3 className="font-serif text-base font-bold mb-4 font-normal">Why Brands Choose To Work With Me</h3>
-                
-                <ul className="space-y-4 text-xs text-stone-200 font-sans">
-                  <li className="flex items-start gap-2">
-                    <span className="text-brand-rose font-bold shrink-0">✓</span>
-                    <span>Authentic content creation</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-brand-rose font-bold shrink-0">✓</span>
-                    <span>Beauty-focused audience</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-brand-rose font-bold shrink-0">✓</span>
-                    <span>Honest recommendations</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-brand-rose font-bold shrink-0">✓</span>
-                    <span>Consistent content publishing</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-brand-rose font-bold shrink-0">✓</span>
-                    <span>Professional communication</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-brand-rose font-bold shrink-0">✓</span>
-                    <span>Long-term collaboration mindset</span>
-                  </li>
-                </ul>
-
-                <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-[11px] font-mono">
-                  <span className="text-stone-400">Collaboration Status</span>
-                  <span className="text-brand-blush bg-brand-rose/25 px-2 py-0.5 rounded font-bold uppercase tracking-wider">OPEN</span>
-                </div>
-              </div>
-
-              {/* Instant proposal info card */}
-              <div className="bg-white p-6 rounded-3xl text-left border border-brand-blush/25 shadow-sm">
-                <span className="font-mono text-[9px] uppercase font-bold text-brand-rose tracking-widest block mb-1">
-                  COLLABORATION INQUIRY
-                </span>
-                <p className="font-serif text-md font-semibold text-brand-dark mb-2">Ready to work together?</p>
-                <p className="font-sans text-xs text-brand-dark/70 leading-relaxed mb-4">
-                  Select a category on the left. The custom details will fill in our contact form below so we can discuss a customized proposal.
-                </p>
-                <div className="w-full bg-brand-sand py-2 px-3 rounded-xl border border-brand-blush/10 flex items-center justify-between text-[10px] font-mono">
-                  <span className="text-brand-dark/60 font-bold">Standard response turnaround</span>
-                  <span className="text-brand-rose font-bold uppercase">&lt; 24 HOURS</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
       </div>
+
     </section>
   );
 }

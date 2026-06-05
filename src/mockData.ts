@@ -165,7 +165,7 @@ export const initialTestimonials: Testimonial[] = [
     author: "Marcus Chen",
     role: "Brand Director @ Aurora Skincare",
     origin: "Brand Representative",
-    text: "Rakhee's focus on authentic sound integration and rapid pacing meant high retention on our sponsored Reel. She delivered the raw files 3 days ahead of schedule. Highly recommend her for any UGC beauty project!",
+    text: "Rakhee delivered beautiful, authentic video content for our product launch that resonated perfectly with beauty enthusiasts. She was highly professional, creative, and a pleasure to work with!",
     avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150",
     rating: 5,
     brandLogo: "Aurora Skin",
@@ -320,13 +320,13 @@ export const initialFAQs: FAQItem[] = [
     id: "faq-1",
     category: "Brands",
     question: "What is your standard turnaround time for deliverables?",
-    answer: "For dedicated sponsored Reels or UGC video concepts, our typical turnaround time is 7-10 business days from the date of physical product delivery. We provide high-fidelity video draft links with synchronized sounds, clear zoom hooks, and retention pacing beforehand.",
+    answer: "For standard sponsored Reels or UGC content, my typical turnaround time is 7-10 business days from the time I receive the physical products. I always share a draft of the video with you for review before posting.",
   },
   {
     id: "faq-2",
     category: "Brands",
     question: "Do you create RAW UGC (User Generated Content) without posting?",
-    answer: "Absolutely! Many brands collaborate for raw video content (such as wear-tests, dewy skincare routines, or tutorial overlays) to run as paid advertisements. We offer options with 30-day, 90-day, or perpetual social media ad usage rights.",
+    answer: "Yes! Many brands hire me to create relatable UGC video content (like wear-tests, skincare applications, or tutorials) for their own social media channels or paid ads. I'm happy to discuss standard usage rights to fit your campaign's needs.",
   },
   {
     id: "faq-3",
@@ -338,13 +338,13 @@ export const initialFAQs: FAQItem[] = [
     id: "faq-4",
     category: "General",
     question: "What makes your engagement level so high at 1,009 followers?",
-    answer: "We focus 100% on Reels and direct-to-camera conversation. Rather than uploading static flat-lays, every post features high-pushed pacing, zoom highlights for closeups, and helpful tutorials that teach, creating strong comment-to-DM interactions and authentic shelf-saves.",
+    answer: "I focus on honest, direct-to-camera conversations and step-by-step beauty tutorials. My community appreciates seeing real skin texture and unedited results, which leads to high trust, active comment discussions, and authentic engagement.",
   },
   {
     id: "faq-5",
     category: "Brands",
     question: "How do you handle product links and tracking?",
-    answer: "We use a premium affiliate tracking portal. For brand sponsorships, we activate Instagram Automations (e.g., commenting 'GLOW' automatically DMs the tracking link directly to the follower), yielding click-through-rates up to 4x higher than standard link-in-bio clicks.",
+    answer: "I share links directly with my audience in the comments and stories. Followers appreciate having easy access to recommended products, making it simple for them to find exactly what worked in the video.",
   },
 ];
 

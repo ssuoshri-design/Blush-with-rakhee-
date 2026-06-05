@@ -8,6 +8,7 @@ import TrustCollab from "./components/TrustCollab";
 import MediaKitAudit from "./components/MediaKitAudit";
 import NewsletterContact from "./components/NewsletterContact";
 import AdminOS from "./components/AdminOS";
+import InstagramDMAssistant from "./components/InstagramDMAssistant";
 
 import { 
   initialStats, 
@@ -421,6 +422,9 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Official Instagram DM Assistant Chatbot Widget */}
+      <InstagramDMAssistant />
 
     </div>
   );

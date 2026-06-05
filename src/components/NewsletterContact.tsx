@@ -138,11 +138,11 @@ export default function NewsletterContact({
 
             <div className="lg:col-span-6 text-left" id="newsletter-left">
               <span className="font-mono text-xs text-brand-rose uppercase tracking-[0.25em] font-bold block mb-2">
-                JOIN THE LUXURY CIRCLE
+                FOLLOW MY BEAUTY JOURNEY
               </span>
               <h2 className="font-serif text-2xl lg:text-3xl text-brand-dark font-semibold leading-tight">
-                Join our Unfiltered <br />
-                Beauty Community
+                Join our Authentic &amp; <br />
+                Real Beauty Community
               </h2>
               <p className="font-sans text-xs sm:text-sm text-stone-600 mt-3 leading-relaxed">
                 Receive curated, high-integrity product cheat sheets, shade-matching alerts matching South Asian undertones, and exclusive drugstore cosmetics coupon reviews directly in your inbox.
@@ -242,7 +242,7 @@ export default function NewsletterContact({
               WORD ON THE STREET
             </span>
             <h2 className="font-serif text-3xl lg:text-4xl text-brand-dark font-semibold">
-              Ecosystem Testimonials
+              What My Community Says
             </h2>
             <div className="w-12 h-1 bg-brand-blush/80 mx-auto mt-4 rounded-full" />
           </div>
@@ -541,7 +541,7 @@ export default function NewsletterContact({
                       type="submit"
                       className="w-full bg-brand-rose hover:bg-brand-dark text-white py-3.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
                     >
-                      Dispatch Proposal to Creator State
+                      Send Collaboration Request
                     </button>
 
                   </form>
