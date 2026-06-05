@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Gift, Sparkles, Copy, Check, ArrowRight, ShieldCheck, CreditCard, Lock, CheckCircle2, AlertCircle, HelpCircle, RefreshCw, UserCheck } from "lucide-react";
+import { Sparkles, Copy, Check, ArrowRight, Lock, CheckCircle2, RefreshCw, Gift } from "lucide-react";
 import { RewardConfig, RewardClaim } from "../types";
 
 interface BeautyRewardWidgetProps {
@@ -19,20 +19,19 @@ export default function BeautyRewardWidget({
   currency,
   formatPrice
 }: BeautyRewardWidgetProps) {
-  // Widget open state
   const [isOpen, setIsOpen] = useState(false);
   const [isOpeningBox, setIsOpeningBox] = useState(false);
   const [revealedReward, setRevealedReward] = useState<RewardConfig | null>(null);
   const [generatedClaim, setGeneratedClaim] = useState<RewardClaim | null>(null);
 
-  // Identity inputs
-  const [typedUserId, setTypedUserId] = useState("");
+  // Simple Email Signup Inputs
+  const [typedEmail, setTypedEmail] = useState("");
   const [clientIp, setClientIp] = useState("127.0.0.1");
   const [isEligible, setIsEligible] = useState(true);
   const [blockedReason, setBlockedReason] = useState("");
-  const [userIdFormSubmitted, setUserIdFormSubmitted] = useState(false);
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
 
-  // Hidden/Cooldown status for 24 hours
+  // Hidden / Cooldown status for 24 hours
   const [isCooldownActive, setIsCooldownActive] = useState(false);
 
   // Copy success indicator
@@ -42,7 +41,6 @@ export default function BeautyRewardWidget({
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<string>("Beauty Foundations Course");
   const [checkoutName, setCheckoutName] = useState("");
-  const [checkoutEmail, setCheckoutEmail] = useState("");
   const [checkoutProgress, setCheckoutProgress] = useState<"idle" | "processing" | "success" | "error">("idle");
   const [paymentId, setPaymentId] = useState("");
 
@@ -52,7 +50,7 @@ export default function BeautyRewardWidget({
     "Professional Makeup Business Mastery": 600
   };
 
-  // On mount, load client's real public IP address and verify local cooldown
+  // Check state on mount
   useEffect(() => {
     // 24 Hour Cooldown check
     const lastClick = localStorage.getItem("blush_widget_last_claimed_click");
@@ -63,7 +61,7 @@ export default function BeautyRewardWidget({
       }
     }
 
-    // IP grab
+    // IP address retrieval to securely prevent multiple claims
     fetch("https://api.ipify.org?format=json")
       .then((res) => res.json())
       .then((data) => {
@@ -88,20 +86,22 @@ export default function BeautyRewardWidget({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Handles client submission of their unique User/Student ID for validation
-  const handleVerifyUserIdAndDraw = (e: React.FormEvent) => {
+  // Handles client submission of their email address for validation
+  const handleVerifyEmailAndDraw = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!typedUserId.trim()) return;
+    const trimmedEmail = typedEmail.trim().toLowerCase();
+    if (!trimmedEmail || !trimmedEmail.includes("@")) {
+      alert("Please enter a valid email address.");
+      return;
+    }
 
-    const trimmedInput = typedUserId.trim().toLowerCase();
-    
     // Retrieve claims log
     const ledgerRaw = localStorage.getItem("blush_reward_ledgers");
     const ledgers = ledgerRaw ? JSON.parse(ledgerRaw) : [];
 
-    // Rule: One User ID, One IP each time
-    const userClaimedToday = ledgers.some((l: any) => 
-      l.userId.trim().toLowerCase() === trimmedInput && 
+    // Rule check: One Email ID, One IP each time
+    const emailClaimedToday = ledgers.some((l: any) => 
+      l.email.trim().toLowerCase() === trimmedEmail && 
       (Date.now() - l.timestamp < 24 * 60 * 60 * 1000)
     );
 
@@ -110,23 +110,23 @@ export default function BeautyRewardWidget({
       (Date.now() - l.timestamp < 24 * 60 * 60 * 1000)
     );
 
-    if (userClaimedToday) {
+    if (emailClaimedToday) {
       setIsEligible(false);
-      setBlockedReason(`This Student ID "${typedUserId}" is currently rate-limited. Limit is 1 reward claim per student every 24 hours.`);
-      setUserIdFormSubmitted(true);
+      setBlockedReason(`This email "${trimmedEmail}" has already unlocked a bonus coupon package today. Check back tomorrow!`);
+      setEmailSubmitted(true);
       return;
     }
 
     if (ipClaimedToday) {
       setIsEligible(false);
-      setBlockedReason(`Your network IP address (${clientIp}) is currently rate-limited. Limit is 1 reward claim per network IP address every 24 hours to prevent spam.`);
-      setUserIdFormSubmitted(true);
+      setBlockedReason(`Only one promotion can be unlocked per reservation network every 24 hours. Please speak with an academy coordinator if you require assistance.`);
+      setEmailSubmitted(true);
       return;
     }
 
-    // Safe to proced! Draw reward and record click
+    // Safe! Proceed to draw reward and record Click immediately
     setIsEligible(true);
-    setUserIdFormSubmitted(true);
+    setEmailSubmitted(true);
     drawRandomReward();
   };
 
@@ -152,10 +152,11 @@ export default function BeautyRewardWidget({
       const claimsSeed = Math.random().toString(36).substring(2, 6).toUpperCase();
       const customCode = `${drawn.code}-${claimsSeed}`;
 
+      const claimName = typedEmail.split("@")[0] || "Academy Guest";
       const claimRecord: RewardClaim = {
         id: "claim-" + Date.now(),
-        userName: typedUserId,
-        userEmail: typedUserId.includes("@") ? typedUserId : `${typedUserId.toLowerCase().replace(/\s+/g, '_')}@gmail.com`,
+        userName: claimName.charAt(0).toUpperCase() + claimName.slice(1),
+        userEmail: typedEmail.trim().toLowerCase(),
         userPhone: "+91 99911 22334",
         rewardId: drawn.id,
         rewardLabel: drawn.label,
@@ -183,13 +184,13 @@ export default function BeautyRewardWidget({
       const ledgerRaw = localStorage.getItem("blush_reward_ledgers");
       const ledgers = ledgerRaw ? JSON.parse(ledgerRaw) : [];
       ledgers.push({
-        userId: typedUserId.trim(),
+        email: typedEmail.trim().toLowerCase(),
         ip: clientIp,
         timestamp: Date.now()
       });
       localStorage.setItem("blush_reward_ledgers", JSON.stringify(ledgers));
 
-    }, 1800);
+    }, 1500);
   };
 
   // ONE-CLICK INSTANT PAYMENT AND AUTOMATIC ENROLLMENT SUCCESS
@@ -205,12 +206,11 @@ export default function BeautyRewardWidget({
       finalPrice = originalPrice - (originalPrice * (revealedReward.value / 100));
     }
 
-    const claimName = typedUserId.includes("@") ? typedUserId.split("@")[0] : typedUserId;
+    const claimName = generatedClaim.userName;
     const generatedPayId = "pay_BLUSH_" + Math.random().toString(36).substring(2, 12).toUpperCase();
     
     setPaymentId(generatedPayId);
     setCheckoutName(claimName);
-    setCheckoutEmail(typedUserId.includes("@") ? typedUserId : `${typedUserId.toLowerCase().replace(/\s+/g, '_')}@gmail.com`);
     setSelectedCourse(targetCourse);
 
     // Create student receipt directly inside local Database structures
@@ -252,7 +252,7 @@ export default function BeautyRewardWidget({
           ? {
               ...c,
               userName: claimName,
-              userEmail: typedUserId.includes("@") ? typedUserId : `${typedUserId.toLowerCase().replace(/\s+/g, '_')}@gmail.com`,
+              userEmail: typedEmail.trim().toLowerCase(),
               userPhone: "+91 99911 22334",
               couponUsed: true,
               usedForCourse: targetCourse,
@@ -291,7 +291,7 @@ export default function BeautyRewardWidget({
 
   return (
     <>
-      {/* Elegantly Restyled display typography launcher button */}
+      {/* Floating launcher badge */}
       <div className="fixed bottom-24 right-6 z-[9980] font-sans flex items-center gap-2">
         <button
           onClick={() => {
@@ -301,7 +301,7 @@ export default function BeautyRewardWidget({
           title="Claim Beauty Reward"
           id="beauty-reward-floating-badge"
         >
-          <span className="text-[12px] font-serif italic tracking-wide text-[#FFD3D6] select-none mr-2.5 group-hover:text-white duration-300">
+          <span className="text-[12.5px] font-serif italic tracking-wide text-[#FFD3D6] select-none mr-3 group-hover:text-white duration-300 font-medium">
             Unlock your private beauty reward
           </span>
           <div className="w-9 h-9 rounded-full bg-[#B76E79] flex items-center justify-center text-white shrink-0 border border-white/20 group-hover:bg-[#FFD3D6] group-hover:text-stone-900 duration-300 relative">
@@ -312,162 +312,143 @@ export default function BeautyRewardWidget({
 
       {isOpen && (
         <div className="fixed inset-0 bg-stone-950/80 backdrop-blur-md z-[9995] flex items-center justify-center p-4 overflow-y-auto font-sans">
-          <div className="bg-white rounded-[32px] border border-stone-100 max-w-sm w-full shadow-2xl relative animate-fadeIn overflow-hidden text-left flex flex-col justify-between">
+          <div className="bg-[#FAF8F6] rounded-[36px] border border-stone-200/60 max-w-sm w-full shadow-2xl relative animate-fadeIn overflow-hidden text-left flex flex-col justify-between">
             
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-stone-50 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-all cursor-pointer font-bold text-sm"
+              className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white text-stone-400 hover:text-stone-700 flex items-center justify-center transition-all cursor-pointer font-sans text-sm border border-stone-100"
             >
               ✕
             </button>
 
-            {/* Step 1: User Verification Flow (Required to fulfill One user ID, one IP each time) */}
-            {!userIdFormSubmitted ? (
-              <div className="p-8 space-y-5">
-                <div className="text-center space-y-2 pb-2">
+            {/* Step 1: Input Email */}
+            {!emailSubmitted ? (
+              <div className="p-8 space-y-6">
+                <div className="text-center space-y-2 pb-1">
                   <div className="w-12 h-12 rounded-full bg-[#FFF2F2] flex items-center justify-center mx-auto text-[#B76E79] border border-[#B76E79]/15">
-                    <UserCheck size={22} className="animate-pulse" />
+                    <Gift size={20} className="animate-pulse" />
                   </div>
-                  <h3 className="font-serif italic text-2xl font-medium tracking-tight text-stone-900">
-                    Verify Your ID
+                  <h3 className="font-serif italic text-2xl font-semibold tracking-wide text-stone-900">
+                    Your Beauty Gift
                   </h3>
-                  <p className="text-xs text-stone-500 font-sans">
-                    Each user is authorized to claim exactly one limited cohort beauty box voucher per day.
+                  <p className="text-[12.5px] text-stone-500 font-sans leading-relaxed px-1">
+                    Enter your email to unlock a premium tuition credit valid for any academy course.
                   </p>
                 </div>
 
-                <form onSubmit={handleVerifyUserIdAndDraw} className="space-y-4">
-                  <div className="space-y-1">
-                    <label className="block text-stone-400 font-bold uppercase text-[9px] tracking-wider">
-                      Student ID or Email Address
+                <form onSubmit={handleVerifyEmailAndDraw} className="space-y-4">
+                  <div className="space-y-1.5 text-center">
+                    <label className="block text-stone-400 font-serif italic text-xs tracking-wide">
+                      Email Address
                     </label>
                     <input
-                      type="text"
+                      type="email"
                       required
-                      placeholder="e.g. STU-10842 or your@gmail.com"
-                      value={typedUserId}
-                      onChange={(e) => setTypedUserId(e.target.value)}
-                      className="w-full bg-stone-50 border border-stone-200 px-3.5 py-3 rounded-xl text-xs text-stone-850 font-mono text-center focus:outline-none focus:ring-1 focus:ring-[#B76E79]"
+                      placeholder="e.g. gorgeous@example.com"
+                      value={typedEmail}
+                      onChange={(e) => setTypedEmail(e.target.value)}
+                      className="w-full bg-white border border-stone-200 px-4 py-3 rounded-2xl text-xs text-stone-850 font-sans text-center focus:outline-none focus:ring-1 focus:ring-[#B76E79] placeholder-stone-300 font-medium tracking-wide shadow-xs"
                     />
-                  </div>
-
-                  <div className="bg-stone-50 border border-stone-200 rounded-2xl p-3 text-center">
-                    <span className="block text-[8px] uppercase tracking-widest text-stone-400 font-mono font-bold">Secure Gate IP Mapping</span>
-                    <strong className="block text-[11px] font-mono text-stone-700 font-bold mt-1">{clientIp}</strong>
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full bg-[#B76E79] hover:bg-[#a35e68] text-white text-[11px] font-mono uppercase tracking-wider py-3.5 rounded-xl transition-all cursor-pointer font-extrabold flex items-center justify-center gap-1.5"
+                    className="w-full bg-[#B76E79] hover:bg-[#a35e68] text-white text-[11px] font-sans uppercase tracking-widest py-4 rounded-2xl transition-all cursor-pointer font-bold flex items-center justify-center gap-2 shadow-sm"
                   >
-                    🚀 Verify Eligibility &amp; Claim Box
+                    <span>REVEAL MY BONUS</span>
+                    <Sparkles size={12} className="animate-pulse" />
                   </button>
                 </form>
+
+                <p className="text-[10px] text-stone-400 text-center select-none font-sans mt-2">
+                  *Voucher valid for immediate program seat bookings.
+                </p>
               </div>
             ) : !isEligible ? (
-              /* Block Screen View */
+              /* Simple Rate-Limit Block Screen */
               <div className="p-8 space-y-6 text-center py-12">
-                <div className="w-14 h-14 bg-red-50 text-red-500 rounded-full border border-red-100 flex items-center justify-center mx-auto">
-                  <Lock size={26} className="animate-bounce" />
+                <div className="w-14 h-14 bg-rose-50 text-[#B76E79] rounded-full border border-rose-100 flex items-center justify-center mx-auto">
+                  <Lock size={22} />
                 </div>
                 
                 <div className="space-y-2">
-                  <h4 className="font-serif italic text-2xl font-medium tracking-tight text-stone-950">
-                    Claim Limit Exceeded
+                  <h4 className="font-serif italic text-2xl font-semibold tracking-wide text-stone-950">
+                    Come Back Tomorrow
                   </h4>
-                  <p className="text-xs text-stone-600 leading-relaxed font-sans">
+                  <p className="text-[12.5px] text-stone-600 leading-relaxed font-sans px-2">
                     {blockedReason}
-                  </p>
-                </div>
-
-                <div className="bg-[#FEFAF8] p-4 rounded-2xl border border-red-100 text-left space-y-1.5 text-xs">
-                  <p className="flex justify-between font-mono text-[10px]">
-                    <span className="text-stone-400">Target ID:</span>
-                    <strong className="text-stone-700">{typedUserId}</strong>
-                  </p>
-                  <p className="flex justify-between font-mono text-[10px]">
-                    <span className="text-stone-400">Target IP:</span>
-                    <strong className="text-stone-700">{clientIp}</strong>
-                  </p>
-                  <p className="flex justify-between font-mono text-[10px] pt-1 border-t border-stone-200 text-stone-400 font-bold">
-                    <span>Gate Status:</span>
-                    <span className="text-red-600 font-extrabold">BLOCKED FOR 24 HOURS</span>
                   </p>
                 </div>
 
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="w-full bg-stone-900 text-white text-xs font-bold py-3.5 rounded-xl cursor-pointer"
+                  className="w-full bg-stone-900 text-white text-[11px] uppercase tracking-widest font-bold py-3.5 rounded-2xl cursor-pointer"
                 >
-                  Close Gate Session
+                  Close
                 </button>
               </div>
             ) : isOpeningBox ? (
-              /* Suspense loading screen */
-              <div className="p-8 text-center space-y-6 py-16">
-                <div className="w-24 h-24 rounded-full bg-[#FFF2F2] flex items-center justify-center mx-auto text-[#B76E79] relative shrink-0 border border-[#B76E79]/20 animate-wiggle">
-                  <div className="absolute inset-0 rounded-full border-2 border-dashed border-[#B76E79] animate-spin duration-[4000ms]" />
-                  <Gift size={44} className="animate-bounce" />
+              /* Instant clean loading */
+              <div className="p-8 text-center space-y-5 py-16">
+                <div className="w-20 h-20 rounded-full bg-[#FFF2F2] flex items-center justify-center mx-auto text-[#B76E79] relative shrink-0 border border-[#B76E79]/20 animate-pulse">
+                  <Gift size={32} />
                 </div>
                 <div className="space-y-2">
-                  <h4 className="font-serif italic text-2xl font-medium tracking-tight text-stone-900">
-                    Hand-Selecting Coupon
+                  <h4 className="font-serif italic text-xl font-medium tracking-wide text-stone-800">
+                    Preparing Your Offer...
                   </h4>
-                  <p className="text-xs text-stone-500 max-w-xs mx-auto leading-relaxed">
-                    Analyzing database configurations, ensuring correct mapping checks for your ID.
-                  </p>
                 </div>
-                <div className="flex justify-center items-center gap-1 font-mono text-[9px] text-[#B76E79] tracking-widest font-bold uppercase shrink-0">
-                  <RefreshCw size={12} className="animate-spin" /> Authorization checked
+                <div className="flex justify-center items-center gap-2 font-sans text-[10px] text-[#B76E79] tracking-wider font-semibold uppercase shrink-0">
+                  <RefreshCw size={12} className="animate-spin" /> Customizing course seat
                 </div>
               </div>
             ) : !isCheckoutOpen ? (
-              /* Step 2: Revealed coupon and immediate Checkout offer */
+              /* Step 2: Unboxed award panel */
               <div className="p-8 space-y-5">
-                <div className="text-center space-y-2 border-b border-stone-100 pb-5">
+                <div className="text-center space-y-2 border-b border-stone-200/40 pb-5">
                   <div className="w-12 h-12 rounded-full bg-[#FFF2F2] flex items-center justify-center mx-auto text-[#B76E79] border border-[#B76E79]/15">
                     <Sparkles size={20} className="animate-bounce" />
                   </div>
-                  <h3 className="font-serif italic text-2xl font-medium tracking-tight text-stone-900">
-                    Your Reward is Live!
+                  <h3 className="font-serif italic text-2xl font-semibold tracking-wide text-stone-900">
+                    Your Gift is Ready
                   </h3>
-                  <p className="text-xs text-stone-500">
-                    Your private cosmetic seat allowance is recorded under ID: <span className="font-mono font-bold text-stone-800">{typedUserId}</span>
+                  <p className="text-xs text-stone-500 font-sans">
+                    Locked to <span className="font-sans font-bold text-stone-800">{typedEmail}</span>
                   </p>
                 </div>
 
                 {revealedReward && generatedClaim && (
-                  <div className="bg-[#FFFBF9] border border-[#B76E79]/25 rounded-2xl p-5 relative overflow-hidden space-y-3.5">
-                    <div className="absolute top-0 right-0 py-1 px-3 bg-[#B76E79] text-white text-[8px] font-mono tracking-widest uppercase font-bold rounded-bl-xl shadow-xs">
-                      {isDiscountType ? `${discountPercent}% Clipped` : "Free Add-on"}
+                  <div className="bg-white border border-[#B76E79]/20 rounded-3xl p-5 relative overflow-hidden space-y-3.5 shadow-xs">
+                    <div className="absolute top-0 right-0 py-1 px-3 bg-[#B76E79] text-white text-[8px] font-sans tracking-widest uppercase font-bold rounded-bl-2xl">
+                      {isDiscountType ? `${discountPercent}% Off` : "Exclusive Seat"}
                     </div>
                     
                     <div className="space-y-1 text-center font-sans">
-                      <span className="font-mono text-[9px] text-[#B76E79] uppercase tracking-widest font-bold block">
-                        Unboxed offer
+                      <span className="font-sans text-[9px] text-[#B76E79] tracking-widest font-bold uppercase block">
+                        Clipped Benefit
                       </span>
                       <h4 className="font-serif italic text-lg font-bold text-stone-900 leading-tight">
                         {revealedReward.label}
                       </h4>
                     </div>
 
-                    <div className="border-t border-brand-rose/10 pt-3 text-[10.5px] text-stone-600 space-y-1">
+                    <div className="border-t border-stone-100 pt-3 text-[11px] text-stone-600 space-y-1.5 font-sans">
                       <p className="flex justify-between">
-                        <span className="text-stone-400">Coupon:</span>
-                        <span className="font-mono font-bold text-stone-800">{generatedClaim.code}</span>
+                        <span className="text-stone-400">Voucher Code:</span>
+                        <span className="font-sans font-bold tracking-wider text-stone-800">{generatedClaim.code}</span>
                       </p>
                       <p className="flex justify-between">
-                        <span className="text-stone-400">Expires on:</span>
-                        <span className="font-mono font-bold text-stone-600">{revealedReward.expiryDate}</span>
+                        <span className="text-stone-400">Validity:</span>
+                        <span className="font-sans font-semibold text-stone-600">{revealedReward.expiryDate}</span>
                       </p>
                       <p className="flex justify-between">
-                        <span className="text-stone-400">Applied Course:</span>
+                        <span className="text-stone-400">Applying To:</span>
                         <span className="font-serif italic font-bold text-right text-[#B76E79] max-w-[150px] truncate">{targetCourseInForm}</span>
                       </p>
                     </div>
 
-                    <div className="flex gap-2 pt-1">
-                      <div className="bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-mono font-semibold text-stone-850 flex-grow flex items-center justify-between select-all leading-none">
+                    <div className="flex gap-2 pt-1 font-sans">
+                      <div className="bg-[#FAF8F6] border border-stone-200 rounded-xl px-3 py-2 text-xs font-sans font-semibold text-stone-850 flex-grow flex items-center justify-between select-all leading-none tracking-wider">
                         <span>{generatedClaim.code}</span>
                       </div>
                       <button
@@ -490,84 +471,80 @@ export default function BeautyRewardWidget({
                   </div>
                 )}
 
-                <div className="space-y-2 pt-2">
-                  <div className="bg-[#FFFDFD] border border-[#B76E79]/10 rounded-2xl p-4 space-y-1.5 text-xs text-left">
-                    <div className="flex justify-between">
-                      <span className="text-stone-400">Std Academy Fee:</span>
-                      <span className="line-through font-mono">{formatPrice(originalFee)}</span>
+                <div className="space-y-3 pt-1">
+                  <div className="bg-white border border-stone-200/60 rounded-3xl p-4.5 space-y-1.5 text-xs text-left shadow-xs">
+                    <div className="flex justify-between text-stone-500">
+                      <span>Standard Rate:</span>
+                      <span className="line-through">{formatPrice(originalFee)}</span>
                     </div>
                     <div className="flex justify-between font-bold text-[#B76E79]">
-                      <span>Discount Applied:</span>
+                      <span>Voucher Applied:</span>
                       <span>-{formatPrice((originalFee * discountPercent)/100)}</span>
                     </div>
-                    <div className="flex justify-between text-stone-900 pt-1.5 border-t border-stone-200">
-                      <span className="font-bold">Total Bill:</span>
-                      <strong className="font-serif text-lg font-bold text-emerald-700 font-mono">{formatPrice(finalFee)}</strong>
+                    <div className="flex justify-between text-stone-905 pt-2 border-t border-stone-100">
+                      <span className="font-serif italic font-semibold text-sm">Your Final Cost:</span>
+                      <strong className="font-serif text-lg font-bold text-emerald-800">{formatPrice(finalFee)}</strong>
                     </div>
                   </div>
 
-                  {/* ONE-CLICK PAYMENT ACTION */}
+                  {/* direct booking card checkout */}
                   <button
                     onClick={handleOneClickCheckoutAndPay}
-                    className="w-full bg-[#B76E79] hover:bg-[#a35e68] text-white text-xs font-bold uppercase tracking-wider py-4 rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full bg-[#B76E79] hover:bg-[#a35e68] text-white text-[11px] font-sans uppercase tracking-wider py-4 rounded-2xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 font-bold"
                   >
-                    <span>Instant Pay with 1 Click</span>
+                    <span>Instant Reserve Seat with 1 Click</span>
                     <ArrowRight size={13} />
                   </button>
                 </div>
 
-                <p className="text-[9.5px] leading-relaxed text-stone-400 text-center">
-                  🔒 PCI-Compliant Razorpay Ingress. Claim is verified for IP: <strong>{clientIp}</strong>
+                <p className="text-[10px] leading-relaxed text-stone-400 text-center font-sans">
+                  🔒 Encrypted and securely processed via Razorpay gateway.
                 </p>
 
               </div>
             ) : (
-              /* Step 3: Success payment screen, instantaneously verified and processed */
+              /* Step 3: Success card */
               <div className="p-8 space-y-6 text-center animate-fadeIn">
-                <div className="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-full border border-emerald-100 flex items-center justify-center mx-auto animate-bounce">
-                  <CheckCircle2 size={30} />
+                <div className="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-full border border-emerald-100 flex items-center justify-center mx-auto zoomIn">
+                  <CheckCircle2 size={26} />
                 </div>
                 
                 <div className="space-y-1.5">
-                  <h5 className="font-serif italic text-2xl font-medium tracking-tight text-stone-900">
-                    Payment Success!
+                  <h5 className="font-serif italic text-2xl font-semibold tracking-wide text-stone-900">
+                    Registration Confirmed!
                   </h5>
-                  <p className="text-xs text-stone-600 font-sans leading-relaxed">
-                    Your enrollment fee of <span className="font-bold text-[#B76E79]">{formatPrice(finalFee)}</span> was successfully transacted via Razorpay. Welcome to Rakhee's cohort roster!
+                  <p className="text-xs text-stone-600 font-sans leading-relaxed px-1">
+                    Your special seat pricing of <span className="font-bold text-[#B76E79]">{formatPrice(finalFee)}</span> has been reserved. Welcome to Rakhee's academy!
                   </p>
                 </div>
 
-                <div className="bg-[#FFFBF9] border border-[#B76E79]/15 rounded-2xl p-4 text-left text-xs space-y-2">
-                  <p className="flex justify-between font-mono text-[10.5px]">
-                    <span className="text-stone-400 font-sans">Student:</span>
-                    <strong className="text-stone-850 font-sans">{checkoutName}</strong>
+                <div className="bg-white border border-stone-200/50 rounded-3xl p-4.5 text-left text-xs space-y-2.5 shadow-xs">
+                  <p className="flex justify-between font-sans text-stone-600">
+                    <span>Student:</span>
+                    <strong className="text-stone-850 font-bold">{checkoutName}</strong>
                   </p>
-                  <p className="flex justify-between font-mono text-[10.5px]">
-                    <span className="text-stone-400 font-sans">Program Plan:</span>
-                    <strong className="text-stone-800 text-right truncate max-w-[150px] font-sans">{selectedCourse}</strong>
+                  <p className="flex justify-between font-sans text-stone-600">
+                    <span>Academy Program:</span>
+                    <strong className="text-stone-800 text-right truncate max-w-[150px]">{selectedCourse}</strong>
                   </p>
-                  <p className="flex justify-between font-mono text-[10.5px]">
-                    <span className="text-stone-400 font-sans">Code Applied:</span>
-                    <strong className="text-[#B76E79] font-bold">{generatedClaim?.code}</strong>
-                  </p>
-                  <p className="flex justify-between text-[9px] pt-1.5 border-t border-stone-200 font-mono text-stone-400 font-bold">
-                    <span>Razorpay ID:</span>
-                    <span className="text-stone-900 select-all font-mono">{paymentId}</span>
+                  <p className="flex justify-between font-sans text-stone-600">
+                    <span>Voucher Used:</span>
+                    <strong className="text-[#B76E79] font-medium tracking-wide">{generatedClaim?.code}</strong>
                   </p>
                 </div>
 
-                <p className="text-[10px] text-stone-500 leading-relaxed max-w-xs mx-auto">
-                  Orientation credentials and receipt codes have been assigned to your profile record <strong>{checkoutEmail}</strong>.
+                <p className="text-[11px] text-stone-500 leading-relaxed font-sans px-2">
+                  An onboarding coordinates dispatch has been sent immediately to <strong>{typedEmail}</strong>.
                 </p>
 
                 <button
                   onClick={() => {
                     setIsOpen(false);
-                    window.location.reload(); // Instantly update statistics inside Admin OS
+                    window.location.reload();
                   }}
-                  className="w-full bg-stone-900 hover:bg-[#B76E79] text-white text-xs font-mono uppercase font-bold py-3.5 rounded-xl transition-all cursor-pointer"
+                  className="w-full bg-stone-900 hover:bg-[#B76E79] text-white text-[11px] uppercase tracking-wider font-semibold py-3.5 rounded-2xl cursor-pointer"
                 >
-                  Return to Dashboard
+                  Return to Academy
                 </button>
               </div>
             )}
